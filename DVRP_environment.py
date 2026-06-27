@@ -4,6 +4,8 @@ import DVRP_algo
 import DVRP_vehicle
 from DVRP_utils import ENV_RNG, NEW_CUSTOMER_RNG
 
+#first git change
+
 class DemoModel(Model):
 
     def on_vehicle_arrival(self, vehicle: Vehicle) -> None:
