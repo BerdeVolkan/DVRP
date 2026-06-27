@@ -3,6 +3,8 @@ from dvrpsim.utils.distances import euclidean_distance
 from DVRP_utils import VEHICLE_RNG
 #from scipy.stats import rv_discrete, norm
 
+
+
 class Truck(Vehicle):
 
     def __init__(self, id: str) -> None:
