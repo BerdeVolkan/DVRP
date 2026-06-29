@@ -2,7 +2,7 @@ from dvrpsim import Model, Location, Order, Vehicle
 from simpy import Resource
 import DVRP_algo
 import DVRP_vehicle
-from DVRP_utils import ENV_RNG, NEW_CUSTOMER_RNG
+from DVRP_utils import ENV_RNG, NEW_CUSTOMER_RNG, NEW_COORD_RNG
 
 class DemoModel(Model):
 
@@ -17,8 +17,8 @@ class DemoModel(Model):
             
             new_id = f'CUSTOMER NEW {self.dynamic_events_count}'
             
-            x_new = NEW_CUSTOMER_RNG.integers(-1000, 1001)
-            y_new = NEW_CUSTOMER_RNG.integers(-1000, 1001)
+            x_new = NEW_COORD_RNG.integers(-1000, 1001)
+            y_new = NEW_COORD_RNG.integers(-1000, 1001)
             
             # Location und Order erstellen
             new_loc = Location(id=new_id, x=x_new, y=y_new)
