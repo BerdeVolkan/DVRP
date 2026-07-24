@@ -63,7 +63,7 @@ def total_distance(routes: list[list[str]], locations: dict) -> float:
 def test_defaults_match_old_hardcoded_behavior() -> None:
     locations, state, num_vehicles = build_test_instance()
 
-    result_manual = solve_vrp_with_ortools(
+    result_manual, _decision_info_manual = solve_vrp_with_ortools(
         locations,
         locations,
         state,
@@ -74,7 +74,7 @@ def test_defaults_match_old_hardcoded_behavior() -> None:
         span_cost_coefficient=10,
     )
 
-    result_default = solve_vrp_with_ortools(locations, locations, state, num_vehicles)
+    result_default, _decision_info_default = solve_vrp_with_ortools(locations, locations, state, num_vehicles)
 
     assert routes_equal(result_manual, result_default), (
         f"Routen weichen ab!\nmanuell: {result_manual}\ndefault: {result_default}"
@@ -95,7 +95,7 @@ def test_all_presets_run_successfully() -> None:
     locations, state, num_vehicles = build_test_instance()
 
     for preset_name, config in SOLVER_CONFIGS.items():
-        routes = solve_vrp_with_ortools(
+        routes, decision_info = solve_vrp_with_ortools(
             locations,
             locations,
             state,
@@ -103,6 +103,7 @@ def test_all_presets_run_successfully() -> None:
             first_solution_strategy=config["first_solution_strategy"],
             local_search_metaheuristic=config["local_search_metaheuristic"],
         )
+        assert decision_info["status"], f"Preset '{preset_name}' hat keinen Solver-Status geliefert!"
 
         assert routes, f"Preset '{preset_name}' hat keine gueltige Loesung geliefert!"
         assert len(routes) == num_vehicles, (

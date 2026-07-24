@@ -1,8 +1,11 @@
+import json
+import os
 from dvrpsim import Model, Location, Order
 from simpy import Resource
 from typing import Any, Generator
 import DVRP_algo
 import DVRP_vehicle
+from DVRP_order import LoggingOrder
 from DVRP_utils import ENV_RNG, NEW_EVENT_TIME_RNG, NEW_COORD_RNG, SIMULATION_HORIZON
 
 class DemoModel(Model):
@@ -14,6 +17,19 @@ class DemoModel(Model):
         self.solver_config = solver_config
         # Positionen der dynamischen Kunden, vorab gezogen via prepare_dynamic_customers()
         self.dynamic_customer_locations: list[Location] = []
+
+        # Zentrales, maschinenlesbares Log fuer die spaetere Auswertung.
+        # HINWEIS: dvrpsim.Model belegt das Attribut "self.log" bereits fuer
+        # sein eigenes Text-/Dateilogging (dvrp.log, siehe dvrpsim.utils.logging).
+        # Ein Ueberschreiben von self.log wuerde die Simulation zum Absturz
+        # bringen (interne Aufrufe wie self.log.on_order_pickup(...) im
+        # dvrpsim-Quellcode). Daher wird hier stattdessen self.run_log verwendet.
+        self.run_log: dict[str, Any] = {
+            "meta": {},
+            "orders": {},
+            "vehicles": {},
+            "decision_points": [],
+        }
 
     def prepare_dynamic_customers(self) -> list[Location]:
         """
@@ -54,7 +70,7 @@ class DemoModel(Model):
         new_loc = self.dynamic_customer_locations[idx]
         self.add_location(new_loc)
 
-        order_new = Order(id=f'O-NEW-{idx + 1}')
+        order_new = LoggingOrder(id=f'O-NEW-{idx + 1}')
         order_new.pickup_location = new_loc
         order_new.delivery_location = self._locations['DEPOT']
 
@@ -71,7 +87,18 @@ class DemoModel(Model):
         """
         state = self.get_state()
         #print(self._locations) # dict mit Key Location zb Depot und Value Location object
-        return DVRP_algo.routing_algorithm(state, self._locations, solver_config=self.solver_config)
+        decision, decision_info = DVRP_algo.routing_algorithm(state, self._locations, solver_config=self.solver_config)
+
+        # solve_vrp_with_ortools()/routing_algorithm() haben keinen direkten
+        # Zugriff auf das Model-Objekt, daher werden die Diagnosedaten hier
+        # (mit Zugriff auf self.run_log und self.env.now) geloggt.
+        if decision_info is not None:
+            self.run_log["decision_points"].append({
+                "time": self.env.now,
+                **decision_info,
+            })
+
+        return decision
 
 
 if __name__ == '__main__':
@@ -81,6 +108,11 @@ if __name__ == '__main__':
 
     num_dynamic_customers = round(total_customers * degree_of_dynamism)
     num_static_customers = total_customers - num_dynamic_customers
+
+    # Bezeichnet den Basis-Seed von DVRP_utils.ENV_RNG (Standardkonfiguration:
+    # kein DVRP_utils.set_all_seeds()-Aufruf hier, um das bisherige RNG-Verhalten
+    # unveraendert zu lassen). Dient nur als Label fuer meta/Dateiname.
+    seed = 42
 
     model = DemoModel(num_dynamic_events=num_dynamic_customers)
 
@@ -100,7 +132,7 @@ if __name__ == '__main__':
         #print(customer_location.x, customer_location.y)
 
         # Erstelle Order für diesen Kunden
-        order = Order(id=f'O-{i+1}')
+        order = LoggingOrder(id=f'O-{i+1}')
         order.pickup_location = customer_location
         order.delivery_location = depot
         order.release_date = 0
@@ -152,6 +184,17 @@ if __name__ == '__main__':
     alpha = 0.75
     T_op = alpha * offline_result['T_offline']
 
+    model.run_log["meta"] = {
+        "solver_config_id": model.solver_config,
+        "seed": seed,
+        "D_offline": offline_result['D_offline'],
+        "T_offline": offline_result['T_offline'],
+        "T_op": T_op,
+        "alpha": alpha,
+        "num_static": num_static_customers,
+        "num_dynamic": num_dynamic_customers,
+    }
+
     print(f"Offline-Referenz: D_offline={offline_result['D_offline']:.2f}, T_offline={offline_result['T_offline']:.2f}")
     print(f"T_op (alpha={alpha}) = {T_op:.2f}")
 
@@ -164,6 +207,18 @@ if __name__ == '__main__':
 
     # Starte Simulation
     model.run()
-    
+
     print("-" * 80)
     print("Simulation abgeschlossen")
+
+    # Strukturiertes Log als JSON exportieren (ergaenzt das bestehende
+    # Text-/Konsolenlogging, ersetzt es nicht).
+    scenario_id = f"n{total_customers}_dod{degree_of_dynamism}"
+    results_dir = "results"
+    os.makedirs(results_dir, exist_ok=True)
+    results_path = os.path.join(results_dir, f"{scenario_id}_{model.solver_config}_{seed}.json")
+
+    with open(results_path, "w") as f:
+        json.dump(model.run_log, f, indent=2)
+
+    print(f"Strukturiertes Log gespeichert unter: {results_path}")

@@ -1,3 +1,4 @@
+import time
 from dvrpsim import Location, Order
 from dvrpsim.utils.distances import euclidean_distance
 from ortools.constraint_solver import routing_enums_pb2
@@ -92,12 +93,15 @@ def solve_vrp_with_ortools(
     local_search_metaheuristic: int = routing_enums_pb2.LocalSearchMetaheuristic.GUIDED_LOCAL_SEARCH,
     time_limit_seconds: float = 2,
     span_cost_coefficient: int = 10,
-) -> list[list[str]]:
+) -> tuple[list[list[str]], dict[str, Any]]:
     """
-    Löst VRP mit OR-Tools und gibt Routen als Location-IDs zurück
+    Löst VRP mit OR-Tools und gibt Routen als Location-IDs zurück, zusammen mit
+    Diagnoseinformationen zum Solve (Laufzeit, Status, Fahrzeugzuordnung offener
+    Auftraege) fuer das strukturierte Logging.
 
     Returns:
-        Liste von Routen, z.B. [['DEPOT', 'CUSTOMER 1', 'DEPOT'], ['DEPOT', 'CUSTOMER 2', 'DEPOT']]
+        (routes, decision_info) - routes z.B. [['DEPOT', 'CUSTOMER 1', 'DEPOT'], ...],
+        decision_info = {'solve_time_seconds', 'status', 'order_vehicle_assignment'}
     """
     #if state['time'] == 0:
     #    pprint(state)
@@ -179,23 +183,50 @@ def solve_vrp_with_ortools(
     search_parameters.time_limit.seconds = time_limit_seconds_int
     search_parameters.time_limit.nanos = int(round((time_limit_seconds - time_limit_seconds_int) * 1e9))
 
-    # Löse Problem
+    # Löse Problem (Laufzeit fuer Diagnose-/Logging-Zwecke messen)
+    solve_start = time.perf_counter()
     solution = routing.SolveWithParameters(search_parameters)
-    
+    solve_time_seconds = time.perf_counter() - solve_start
+
+    status_name = routing_enums_pb2.RoutingSearchStatus.Value.Name(routing.status())
+
     if solution:
         # Extrahiere Routen als Indizes
         routes_indices = extract_solution(data, manager, routing, solution)
-        
+
         # Konvertiere Indizes zu Location-IDs
         routes_ids = []
         for route in routes_indices:
             route_ids = [data["location_ids"][idx] for idx in route]
             routes_ids.append(route_ids)
         #print(routes_ids)
-        return routes_ids
     else:
         print("Keine Lösung gefunden!")
-        return []
+        routes_ids = []
+
+    # Fahrzeugzuordnung der zu diesem Zeitpunkt noch offenen (nicht abgeholten)
+    # Auftraege in dieser Loesung, als {order_id: vehicle_id}. state['open_orders']
+    # ist optional (solve_offline_reference() uebergibt einen state ohne diesen
+    # Key), daher .get(...) mit leerem Fallback.
+    order_location_map = {
+        order_info['pickup_location']: order_id
+        for order_id, order_info in state.get('open_orders', {}).items()
+        if order_info.get('pickup_vehicle') is None
+    }
+    order_vehicle_assignment = {}
+    for vehicle_idx, route in enumerate(routes_ids):
+        vehicle_id = f'TRUCK-{vehicle_idx + 1}'
+        for loc_id in route:
+            if loc_id in order_location_map:
+                order_vehicle_assignment[order_location_map[loc_id]] = vehicle_id
+
+    decision_info = {
+        'solve_time_seconds': solve_time_seconds,
+        'status': status_name,
+        'order_vehicle_assignment': order_vehicle_assignment,
+    }
+
+    return routes_ids, decision_info
 
 
 def solve_offline_reference(
@@ -250,7 +281,10 @@ def solve_offline_reference(
     }
 
     config = SOLVER_CONFIGS['baseline']
-    routes = solve_vrp_with_ortools(
+    # decision_info wird hier nicht benoetigt: die Offline-Referenz ist keine
+    # Reoptimierungs-Entscheidung waehrend der Simulation, sondern ein einmaliger
+    # statischer Solve vor Simulationsbeginn.
+    routes, _decision_info = solve_vrp_with_ortools(
         locations,
         locations,
         state,
@@ -423,33 +457,40 @@ def routing_algorithm(
     solver_config: str = DEFAULT_SOLVER_CONFIG,
     time_limit_seconds: float = 2,
     span_cost_coefficient: int = 10,
-) -> dict[str, Any]:
+) -> tuple[dict[str, Any], dict[str, Any] | None]:
     """
     Hauptroutingalgorithmus mit OR-Tools
+
+    Returns:
+        (decision, decision_info) - decision ist das dvrpsim-Entscheidungsformat
+        ({'vehicles': ..., 'orders': ...}); decision_info enthaelt Solver-
+        Diagnosedaten (siehe solve_vrp_with_ortools) fuer das Logging, oder
+        None, falls kein OR-Tools-Solve stattgefunden hat (keine offenen
+        Auftraege bzw. keine Fahrzeuge).
     """
     # Sammle nicht delivered Aufträge
     undelivered_orders = [
         order_id for order_id in state['open_orders'].keys()
     ]
     #print(undelivered_orders)
-    
+
     if len(undelivered_orders) == 0:
-        return {'vehicles': {}, 'orders': {}}
-    
+        return {'vehicles': {}, 'orders': {}}, None
+
     # Sammle alle Fahrzeuge
     all_vehicles = [
         vehicle_id for vehicle_id in state['vehicles'].keys()
     ]
-    
+
     if len(all_vehicles) == 0:
         return {
             'vehicles': {},
             'orders': {
-                order_id: {'status': 'rejected'} 
+                order_id: {'status': 'rejected'}
                 for order_id in undelivered_orders
             }
-        }
-    
+        }, None
+
     # routing_locations enthalten nur locations welche noch nicht picked up sind
     unpicked_orders = [
         order_id for order_id in state['open_orders'].keys()
@@ -472,7 +513,7 @@ def routing_algorithm(
     # Löse mit OR-Tools
     num_vehicles = len(all_vehicles)
     config = SOLVER_CONFIGS[solver_config]
-    routes = solve_vrp_with_ortools(
+    routes, decision_info = solve_vrp_with_ortools(
         routing_locations,
         distance_location,
         state,
@@ -484,4 +525,4 @@ def routing_algorithm(
     )
 
     # Konvertiere zu DVRP Format
-    return convert_ortools_solution_to_dvrp(routes, state, locations)
+    return convert_ortools_solution_to_dvrp(routes, state, locations), decision_info
