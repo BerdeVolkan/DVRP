@@ -1,0 +1,285 @@
+{
+  "scenario_id": "n50_dod0.4",
+  "seed": 2,
+  "total_customers": 50,
+  "degree_of_dynamism": 0.4,
+  "num_vehicles": 4,
+  "alpha": 0.75,
+  "static_customers": [
+    {
+      "id": "CUSTOMER 1",
+      "x": 675,
+      "y": -477
+    },
+    {
+      "id": "CUSTOMER 2",
+      "x": -782,
+      "y": -403
+    },
+    {
+      "id": "CUSTOMER 3",
+      "x": -172,
+      "y": 629
+    },
+    {
+      "id": "CUSTOMER 4",
+      "x": -98,
+      "y": -817
+    },
+    {
+      "id": "CUSTOMER 5",
+      "x": -330,
+      "y": 200
+    },
+    {
+      "id": "CUSTOMER 6",
+      "x": 627,
+      "y": 457
+    },
+    {
+      "id": "CUSTOMER 7",
+      "x": 986,
+      "y": -625
+    },
+    {
+      "id": "CUSTOMER 8",
+      "x": 761,
+      "y": -890
+    },
+    {
+      "id": "CUSTOMER 9",
+      "x": 117,
+      "y": -450
+    },
+    {
+      "id": "CUSTOMER 10",
+      "x": -598,
+      "y": 315
+    },
+    {
+      "id": "CUSTOMER 11",
+      "x": -389,
+      "y": 125
+    },
+    {
+      "id": "CUSTOMER 12",
+      "x": -480,
+      "y": -700
+    },
+    {
+      "id": "CUSTOMER 13",
+      "x": 499,
+      "y": -135
+    },
+    {
+      "id": "CUSTOMER 14",
+      "x": 358,
+      "y": 339
+    },
+    {
+      "id": "CUSTOMER 15",
+      "x": 891,
+      "y": -155
+    },
+    {
+      "id": "CUSTOMER 16",
+      "x": -561,
+      "y": 267
+    },
+    {
+      "id": "CUSTOMER 17",
+      "x": 870,
+      "y": 935
+    },
+    {
+      "id": "CUSTOMER 18",
+      "x": 736,
+      "y": 366
+    },
+    {
+      "id": "CUSTOMER 19",
+      "x": -240,
+      "y": -217
+    },
+    {
+      "id": "CUSTOMER 20",
+      "x": -921,
+      "y": -626
+    },
+    {
+      "id": "CUSTOMER 21",
+      "x": -334,
+      "y": -308
+    },
+    {
+      "id": "CUSTOMER 22",
+      "x": 160,
+      "y": 22
+    },
+    {
+      "id": "CUSTOMER 23",
+      "x": 385,
+      "y": 783
+    },
+    {
+      "id": "CUSTOMER 24",
+      "x": 754,
+      "y": 551
+    },
+    {
+      "id": "CUSTOMER 25",
+      "x": 954,
+      "y": -364
+    },
+    {
+      "id": "CUSTOMER 26",
+      "x": 815,
+      "y": 849
+    },
+    {
+      "id": "CUSTOMER 27",
+      "x": -553,
+      "y": -58
+    },
+    {
+      "id": "CUSTOMER 28",
+      "x": 139,
+      "y": 388
+    },
+    {
+      "id": "CUSTOMER 29",
+      "x": 401,
+      "y": -786
+    },
+    {
+      "id": "CUSTOMER 30",
+      "x": -46,
+      "y": -791
+    }
+  ],
+  "dynamic_customers": [
+    {
+      "id": "CUSTOMER NEW 1",
+      "x": 482,
+      "y": 690,
+      "release_date": 1777.0566550224005
+    },
+    {
+      "id": "CUSTOMER NEW 2",
+      "x": -786,
+      "y": -678,
+      "release_date": 2550.650006552173
+    },
+    {
+      "id": "CUSTOMER NEW 3",
+      "x": -84,
+      "y": 116,
+      "release_date": 2205.163037804655
+    },
+    {
+      "id": "CUSTOMER NEW 4",
+      "x": 524,
+      "y": -264,
+      "release_date": 640.2317039755147
+    },
+    {
+      "id": "CUSTOMER NEW 5",
+      "x": -929,
+      "y": -570,
+      "release_date": 853.3296475691649
+    },
+    {
+      "id": "CUSTOMER NEW 6",
+      "x": -87,
+      "y": -228,
+      "release_date": 2483.387013012749
+    },
+    {
+      "id": "CUSTOMER NEW 7",
+      "x": 831,
+      "y": -144,
+      "release_date": 14.968504842624203
+    },
+    {
+      "id": "CUSTOMER NEW 8",
+      "x": 276,
+      "y": 223,
+      "release_date": 2334.634474486716
+    },
+    {
+      "id": "CUSTOMER NEW 9",
+      "x": -818,
+      "y": 473,
+      "release_date": 2265.9539359202126
+    },
+    {
+      "id": "CUSTOMER NEW 10",
+      "x": -901,
+      "y": -970,
+      "release_date": 1330.271880846046
+    },
+    {
+      "id": "CUSTOMER NEW 11",
+      "x": 171,
+      "y": -492,
+      "release_date": 861.4776774687765
+    },
+    {
+      "id": "CUSTOMER NEW 12",
+      "x": -268,
+      "y": 208,
+      "release_date": 791.5240364801433
+    },
+    {
+      "id": "CUSTOMER NEW 13",
+      "x": -688,
+      "y": -833,
+      "release_date": 724.5576413530747
+    },
+    {
+      "id": "CUSTOMER NEW 14",
+      "x": 402,
+      "y": 996,
+      "release_date": 1265.2880297750628
+    },
+    {
+      "id": "CUSTOMER NEW 15",
+      "x": 366,
+      "y": 665,
+      "release_date": 1434.358252878269
+    },
+    {
+      "id": "CUSTOMER NEW 16",
+      "x": -171,
+      "y": -927,
+      "release_date": 1573.513496080616
+    },
+    {
+      "id": "CUSTOMER NEW 17",
+      "x": 301,
+      "y": 135,
+      "release_date": 2830.064363388819
+    },
+    {
+      "id": "CUSTOMER NEW 18",
+      "x": 498,
+      "y": 219,
+      "release_date": 2253.424019170629
+    },
+    {
+      "id": "CUSTOMER NEW 19",
+      "x": -26,
+      "y": -987,
+      "release_date": 1768.7662115047442
+    },
+    {
+      "id": "CUSTOMER NEW 20",
+      "x": 397,
+      "y": -642,
+      "release_date": 2811.4716965328707
+    }
+  ],
+  "D_offline": 13477.399513783455,
+  "T_offline": 3790.4752153029144,
+  "T_op": 2842.8564114771857
+}

@@ -1,0 +1,925 @@
+{
+  "meta": {
+    "solver_config_id": "greedy_construction",
+    "seed": 1,
+    "scenario_id": "n50_dod0.4",
+    "D_offline": 14387.580645947017,
+    "T_offline": 3690.7493862179076,
+    "T_op": 2768.062039663431,
+    "alpha": 0.75,
+    "num_static": 30,
+    "num_dynamic": 20
+  },
+  "orders": {
+    "O-1": {
+      "t_request": 0,
+      "t_pickup": 61.09314681077663,
+      "t_delivery": 4831.516442564279
+    },
+    "O-2": {
+      "t_request": 0,
+      "t_pickup": 1673.2239953767344,
+      "t_delivery": 3861.3876286153345
+    },
+    "O-3": {
+      "t_request": 0,
+      "t_pickup": 1542.8295587301038,
+      "t_delivery": 4849.516442564279
+    },
+    "O-4": {
+      "t_request": 0,
+      "t_pickup": 1536.1906661576115,
+      "t_delivery": 3858.3876286153345
+    },
+    "O-5": {
+      "t_request": 0,
+      "t_pickup": 3490.921853135955,
+      "t_delivery": 4861.516442564279
+    },
+    "O-6": {
+      "t_request": 0,
+      "t_pickup": 3025.027180164877,
+      "t_delivery": 4589.459023310863
+    },
+    "O-7": {
+      "t_request": 0,
+      "t_pickup": 3113.2128311346755,
+      "t_delivery": 4900.516442564279
+    },
+    "O-8": {
+      "t_request": 0,
+      "t_pickup": 541.6952780220782,
+      "t_delivery": 4834.516442564279
+    },
+    "O-9": {
+      "t_request": 0,
+      "t_pickup": 306.54063768239536,
+      "t_delivery": 3849.3876286153345
+    },
+    "O-10": {
+      "t_request": 0,
+      "t_pickup": 1799.1777452776003,
+      "t_delivery": 4852.516442564279
+    },
+    "O-11": {
+      "t_request": 0,
+      "t_pickup": 1133.844565889356,
+      "t_delivery": 3855.3876286153345
+    },
+    "O-12": {
+      "t_request": 0,
+      "t_pickup": 697.2217409019885,
+      "t_delivery": 3852.3876286153345
+    },
+    "O-13": {
+      "t_request": 0,
+      "t_pickup": 3322.527445044093,
+      "t_delivery": 4595.459023310863
+    },
+    "O-14": {
+      "t_request": 0,
+      "t_pickup": 2390.7084563319822,
+      "t_delivery": 3867.3876286153345
+    },
+    "O-15": {
+      "t_request": 0,
+      "t_pickup": 1127.1911458608556,
+      "t_delivery": 4840.516442564279
+    },
+    "O-16": {
+      "t_request": 0,
+      "t_pickup": 824.1894847358712,
+      "t_delivery": 4837.516442564279
+    },
+    "O-17": {
+      "t_request": 0,
+      "t_pickup": 1701.9846213213627,
+      "t_delivery": 4574.459023310863
+    },
+    "O-18": {
+      "t_request": 0,
+      "t_pickup": 3818.267822835904,
+      "t_delivery": 4864.516442564279
+    },
+    "O-19": {
+      "t_request": 0,
+      "t_pickup": 1905.5708311671754,
+      "t_delivery": 4577.459023310863
+    },
+    "O-20": {
+      "t_request": 0,
+      "t_pickup": 480.356289833282,
+      "t_delivery": 4562.459023310863
+    },
+    "O-21": {
+      "t_request": 0,
+      "t_pickup": 1126.7529186148497,
+      "t_delivery": 4876.516442564279
+    },
+    "O-22": {
+      "t_request": 0,
+      "t_pickup": 1260.164425578514,
+      "t_delivery": 4843.516442564279
+    },
+    "O-23": {
+      "t_request": 0,
+      "t_pickup": 32.26549190084312,
+      "t_delivery": 4559.459023310863
+    },
+    "O-24": {
+      "t_request": 0,
+      "t_pickup": 1812.924097590098,
+      "t_delivery": 4885.516442564279
+    },
+    "O-25": {
+      "t_request": 0,
+      "t_pickup": 1701.6436850039802,
+      "t_delivery": 3864.3876286153345
+    },
+    "O-26": {
+      "t_request": 0,
+      "t_pickup": 971.0454041596352,
+      "t_delivery": 4873.516442564279
+    },
+    "O-27": {
+      "t_request": 0,
+      "t_pickup": 424.0426518730068,
+      "t_delivery": 4870.516442564279
+    },
+    "O-28": {
+      "t_request": 0,
+      "t_pickup": 2703.078556238055,
+      "t_delivery": 4583.459023310863
+    },
+    "O-29": {
+      "t_request": 0,
+      "t_pickup": 1114.1868548297166,
+      "t_delivery": 4568.459023310863
+    },
+    "O-30": {
+      "t_request": 0,
+      "t_pickup": 2227.5110581208446,
+      "t_delivery": 4888.516442564279
+    },
+    "O-NEW-13": {
+      "t_request": 24.624141614864545,
+      "t_pickup": 699.0403916958783,
+      "t_delivery": 4565.459023310863
+    },
+    "O-NEW-17": {
+      "t_request": 133.09807510639894,
+      "t_pickup": 4353.170252929819,
+      "t_delivery": 4867.516442564279
+    },
+    "O-NEW-11": {
+      "t_request": 143.1897233952316,
+      "t_pickup": 1457.1516046442157,
+      "t_delivery": 4846.516442564279
+    },
+    "O-NEW-10": {
+      "t_request": 340.3951628524913,
+      "t_pickup": 1379.3522003376831,
+      "t_delivery": 4879.516442564279
+    },
+    "O-NEW-18": {
+      "t_request": 574.2047583231639,
+      "t_pickup": 2139.981523296677,
+      "t_delivery": 4855.516442564279
+    },
+    "O-NEW-8": {
+      "t_request": 913.3593153286653,
+      "t_pickup": 1541.7828707221206,
+      "t_delivery": 4882.516442564279
+    },
+    "O-NEW-2": {
+      "t_request": 950.1950640525496,
+      "t_pickup": 3118.1095604587626,
+      "t_delivery": 4592.459023310863
+    },
+    "O-NEW-3": {
+      "t_request": 1021.6010165609473,
+      "t_pickup": 1272.4334547927238,
+      "t_delivery": 4571.459023310863
+    },
+    "O-NEW-4": {
+      "t_request": 1036.6302808005514,
+      "t_pickup": 3961.4993892822313,
+      "t_delivery": 4601.459023310863
+    },
+    "O-NEW-20": {
+      "t_request": 1197.172470493676,
+      "t_pickup": 3487.26957234984,
+      "t_delivery": 4598.459023310863
+    },
+    "O-NEW-1": {
+      "t_request": 1489.6723124095745,
+      "t_pickup": 4401.911296054846,
+      "t_delivery": 4604.459023310863
+    },
+    "O-NEW-6": {
+      "t_request": 1751.5086185627665,
+      "t_pickup": 2766.314767646199,
+      "t_delivery": 4858.516442564279
+    },
+    "O-NEW-7": {
+      "t_request": 1866.57047446613,
+      "t_pickup": 3004.2689206020978,
+      "t_delivery": 4897.516442564279
+    },
+    "O-NEW-9": {
+      "t_request": 1882.0542679648731,
+      "t_pickup": 2228.5957523181664,
+      "t_delivery": 4580.459023310863
+    },
+    "O-NEW-16": {
+      "t_request": 2173.512649639035,
+      "t_pickup": 2460.467764020457,
+      "t_delivery": 4891.516442564279
+    },
+    "O-NEW-15": {
+      "t_request": 2289.1956824565186,
+      "t_pickup": 2818.2879433245544,
+      "t_delivery": 4894.516442564279
+    },
+    "O-NEW-19": {
+      "t_request": 2352.480792249261,
+      "t_pickup": 2950.4048695434158,
+      "t_delivery": 4586.459023310863
+    },
+    "O-NEW-12": {
+      "t_request": 2353.3823935517303,
+      "t_pickup": 3121.831902670118,
+      "t_delivery": 3870.3876286153345
+    },
+    "O-NEW-14": {
+      "t_request": 2709.289334539036,
+      "t_pickup": 3411.445847525489,
+      "t_delivery": 4903.516442564279
+    },
+    "O-NEW-5": {
+      "t_request": 2733.308993590987,
+      "t_pickup": 3841.9607247468057,
+      "t_delivery": 4906.516442564279
+    }
+  },
+  "vehicles": {
+    "TRUCK-3": {
+      "total_distance": 4524.459023310863
+    },
+    "TRUCK-1": {
+      "total_distance": 4802.516442564279
+    },
+    "TRUCK-2": {
+      "total_distance": 3830.3876286153345
+    },
+    "TRUCK-4": {
+      "total_distance": 4819.8157939674575
+    }
+  },
+  "decision_points": [
+    {
+      "time": 0,
+      "solve_time_seconds": 2.0005252080009086,
+      "status": "ROUTING_SUCCESS",
+      "order_vehicle_assignment": {
+        "O-1": "TRUCK-1",
+        "O-8": "TRUCK-1",
+        "O-16": "TRUCK-1",
+        "O-15": "TRUCK-1",
+        "O-22": "TRUCK-1",
+        "O-3": "TRUCK-1",
+        "O-10": "TRUCK-1",
+        "O-5": "TRUCK-1",
+        "O-18": "TRUCK-1",
+        "O-9": "TRUCK-2",
+        "O-12": "TRUCK-2",
+        "O-11": "TRUCK-2",
+        "O-4": "TRUCK-2",
+        "O-2": "TRUCK-2",
+        "O-25": "TRUCK-2",
+        "O-14": "TRUCK-2",
+        "O-23": "TRUCK-3",
+        "O-20": "TRUCK-3",
+        "O-29": "TRUCK-3",
+        "O-17": "TRUCK-3",
+        "O-19": "TRUCK-3",
+        "O-28": "TRUCK-3",
+        "O-13": "TRUCK-3",
+        "O-6": "TRUCK-3",
+        "O-27": "TRUCK-4",
+        "O-26": "TRUCK-4",
+        "O-21": "TRUCK-4",
+        "O-24": "TRUCK-4",
+        "O-30": "TRUCK-4",
+        "O-7": "TRUCK-4"
+      }
+    },
+    {
+      "time": 24.624141614864545,
+      "solve_time_seconds": 2.000442832999397,
+      "status": "ROUTING_SUCCESS",
+      "order_vehicle_assignment": {
+        "O-1": "TRUCK-1",
+        "O-8": "TRUCK-1",
+        "O-16": "TRUCK-1",
+        "O-15": "TRUCK-1",
+        "O-22": "TRUCK-1",
+        "O-3": "TRUCK-1",
+        "O-10": "TRUCK-1",
+        "O-5": "TRUCK-1",
+        "O-18": "TRUCK-1",
+        "O-9": "TRUCK-2",
+        "O-12": "TRUCK-2",
+        "O-11": "TRUCK-2",
+        "O-4": "TRUCK-2",
+        "O-2": "TRUCK-2",
+        "O-25": "TRUCK-2",
+        "O-14": "TRUCK-2",
+        "O-23": "TRUCK-3",
+        "O-20": "TRUCK-3",
+        "O-NEW-13": "TRUCK-3",
+        "O-29": "TRUCK-3",
+        "O-17": "TRUCK-3",
+        "O-19": "TRUCK-3",
+        "O-28": "TRUCK-3",
+        "O-13": "TRUCK-3",
+        "O-6": "TRUCK-3",
+        "O-27": "TRUCK-4",
+        "O-26": "TRUCK-4",
+        "O-21": "TRUCK-4",
+        "O-24": "TRUCK-4",
+        "O-30": "TRUCK-4",
+        "O-7": "TRUCK-4"
+      }
+    },
+    {
+      "time": 133.09807510639894,
+      "solve_time_seconds": 2.000651624999591,
+      "status": "ROUTING_SUCCESS",
+      "order_vehicle_assignment": {
+        "O-8": "TRUCK-1",
+        "O-16": "TRUCK-1",
+        "O-15": "TRUCK-1",
+        "O-22": "TRUCK-1",
+        "O-3": "TRUCK-1",
+        "O-10": "TRUCK-1",
+        "O-5": "TRUCK-1",
+        "O-18": "TRUCK-1",
+        "O-9": "TRUCK-2",
+        "O-12": "TRUCK-2",
+        "O-11": "TRUCK-2",
+        "O-4": "TRUCK-2",
+        "O-2": "TRUCK-2",
+        "O-25": "TRUCK-2",
+        "O-14": "TRUCK-2",
+        "O-20": "TRUCK-3",
+        "O-NEW-13": "TRUCK-3",
+        "O-29": "TRUCK-3",
+        "O-17": "TRUCK-3",
+        "O-19": "TRUCK-3",
+        "O-28": "TRUCK-3",
+        "O-13": "TRUCK-3",
+        "O-6": "TRUCK-3",
+        "O-27": "TRUCK-4",
+        "O-26": "TRUCK-4",
+        "O-21": "TRUCK-4",
+        "O-24": "TRUCK-4",
+        "O-30": "TRUCK-4",
+        "O-7": "TRUCK-4",
+        "O-NEW-17": "TRUCK-4"
+      }
+    },
+    {
+      "time": 143.1897233952316,
+      "solve_time_seconds": 2.000448957995104,
+      "status": "ROUTING_SUCCESS",
+      "order_vehicle_assignment": {
+        "O-8": "TRUCK-1",
+        "O-16": "TRUCK-1",
+        "O-15": "TRUCK-1",
+        "O-22": "TRUCK-1",
+        "O-NEW-11": "TRUCK-1",
+        "O-3": "TRUCK-1",
+        "O-10": "TRUCK-1",
+        "O-5": "TRUCK-1",
+        "O-18": "TRUCK-1",
+        "O-9": "TRUCK-2",
+        "O-12": "TRUCK-2",
+        "O-11": "TRUCK-2",
+        "O-4": "TRUCK-2",
+        "O-2": "TRUCK-2",
+        "O-25": "TRUCK-2",
+        "O-14": "TRUCK-2",
+        "O-20": "TRUCK-3",
+        "O-NEW-13": "TRUCK-3",
+        "O-29": "TRUCK-3",
+        "O-17": "TRUCK-3",
+        "O-19": "TRUCK-3",
+        "O-28": "TRUCK-3",
+        "O-13": "TRUCK-3",
+        "O-6": "TRUCK-3",
+        "O-27": "TRUCK-4",
+        "O-26": "TRUCK-4",
+        "O-21": "TRUCK-4",
+        "O-24": "TRUCK-4",
+        "O-30": "TRUCK-4",
+        "O-7": "TRUCK-4",
+        "O-NEW-17": "TRUCK-4"
+      }
+    },
+    {
+      "time": 340.3951628524913,
+      "solve_time_seconds": 2.000740916002542,
+      "status": "ROUTING_SUCCESS",
+      "order_vehicle_assignment": {
+        "O-8": "TRUCK-1",
+        "O-16": "TRUCK-1",
+        "O-15": "TRUCK-1",
+        "O-22": "TRUCK-1",
+        "O-NEW-11": "TRUCK-1",
+        "O-3": "TRUCK-1",
+        "O-10": "TRUCK-1",
+        "O-5": "TRUCK-1",
+        "O-18": "TRUCK-1",
+        "O-12": "TRUCK-2",
+        "O-11": "TRUCK-2",
+        "O-4": "TRUCK-2",
+        "O-2": "TRUCK-2",
+        "O-25": "TRUCK-2",
+        "O-14": "TRUCK-2",
+        "O-NEW-17": "TRUCK-2",
+        "O-20": "TRUCK-3",
+        "O-NEW-13": "TRUCK-3",
+        "O-29": "TRUCK-3",
+        "O-17": "TRUCK-3",
+        "O-19": "TRUCK-3",
+        "O-28": "TRUCK-3",
+        "O-13": "TRUCK-3",
+        "O-6": "TRUCK-3",
+        "O-27": "TRUCK-4",
+        "O-26": "TRUCK-4",
+        "O-21": "TRUCK-4",
+        "O-NEW-10": "TRUCK-4",
+        "O-24": "TRUCK-4",
+        "O-30": "TRUCK-4",
+        "O-7": "TRUCK-4"
+      }
+    },
+    {
+      "time": 574.2047583231639,
+      "solve_time_seconds": 2.000433000001067,
+      "status": "ROUTING_SUCCESS",
+      "order_vehicle_assignment": {
+        "O-16": "TRUCK-1",
+        "O-15": "TRUCK-1",
+        "O-22": "TRUCK-1",
+        "O-NEW-11": "TRUCK-1",
+        "O-3": "TRUCK-1",
+        "O-10": "TRUCK-1",
+        "O-NEW-18": "TRUCK-1",
+        "O-5": "TRUCK-1",
+        "O-18": "TRUCK-1",
+        "O-12": "TRUCK-2",
+        "O-11": "TRUCK-2",
+        "O-4": "TRUCK-2",
+        "O-2": "TRUCK-2",
+        "O-25": "TRUCK-2",
+        "O-14": "TRUCK-2",
+        "O-NEW-17": "TRUCK-2",
+        "O-NEW-13": "TRUCK-3",
+        "O-29": "TRUCK-3",
+        "O-17": "TRUCK-3",
+        "O-19": "TRUCK-3",
+        "O-28": "TRUCK-3",
+        "O-13": "TRUCK-3",
+        "O-6": "TRUCK-3",
+        "O-26": "TRUCK-4",
+        "O-21": "TRUCK-4",
+        "O-NEW-10": "TRUCK-4",
+        "O-24": "TRUCK-4",
+        "O-30": "TRUCK-4",
+        "O-7": "TRUCK-4"
+      }
+    },
+    {
+      "time": 913.3593153286653,
+      "solve_time_seconds": 2.0004719589996967,
+      "status": "ROUTING_SUCCESS",
+      "order_vehicle_assignment": {
+        "O-15": "TRUCK-1",
+        "O-22": "TRUCK-1",
+        "O-NEW-11": "TRUCK-1",
+        "O-3": "TRUCK-1",
+        "O-10": "TRUCK-1",
+        "O-NEW-18": "TRUCK-1",
+        "O-5": "TRUCK-1",
+        "O-18": "TRUCK-1",
+        "O-11": "TRUCK-2",
+        "O-4": "TRUCK-2",
+        "O-2": "TRUCK-2",
+        "O-25": "TRUCK-2",
+        "O-14": "TRUCK-2",
+        "O-NEW-17": "TRUCK-2",
+        "O-29": "TRUCK-3",
+        "O-17": "TRUCK-3",
+        "O-19": "TRUCK-3",
+        "O-28": "TRUCK-3",
+        "O-13": "TRUCK-3",
+        "O-6": "TRUCK-3",
+        "O-26": "TRUCK-4",
+        "O-21": "TRUCK-4",
+        "O-NEW-10": "TRUCK-4",
+        "O-NEW-8": "TRUCK-4",
+        "O-24": "TRUCK-4",
+        "O-30": "TRUCK-4",
+        "O-7": "TRUCK-4"
+      }
+    },
+    {
+      "time": 950.1950640525496,
+      "solve_time_seconds": 2.0004634169963538,
+      "status": "ROUTING_SUCCESS",
+      "order_vehicle_assignment": {
+        "O-15": "TRUCK-1",
+        "O-22": "TRUCK-1",
+        "O-NEW-11": "TRUCK-1",
+        "O-3": "TRUCK-1",
+        "O-10": "TRUCK-1",
+        "O-NEW-18": "TRUCK-1",
+        "O-5": "TRUCK-1",
+        "O-18": "TRUCK-1",
+        "O-11": "TRUCK-2",
+        "O-4": "TRUCK-2",
+        "O-2": "TRUCK-2",
+        "O-25": "TRUCK-2",
+        "O-14": "TRUCK-2",
+        "O-NEW-17": "TRUCK-2",
+        "O-29": "TRUCK-3",
+        "O-17": "TRUCK-3",
+        "O-19": "TRUCK-3",
+        "O-28": "TRUCK-3",
+        "O-13": "TRUCK-3",
+        "O-6": "TRUCK-3",
+        "O-NEW-2": "TRUCK-3",
+        "O-26": "TRUCK-4",
+        "O-21": "TRUCK-4",
+        "O-NEW-10": "TRUCK-4",
+        "O-NEW-8": "TRUCK-4",
+        "O-24": "TRUCK-4",
+        "O-30": "TRUCK-4",
+        "O-7": "TRUCK-4"
+      }
+    },
+    {
+      "time": 1021.6010165609473,
+      "solve_time_seconds": 2.0004299169959268,
+      "status": "ROUTING_SUCCESS",
+      "order_vehicle_assignment": {
+        "O-15": "TRUCK-1",
+        "O-22": "TRUCK-1",
+        "O-NEW-11": "TRUCK-1",
+        "O-3": "TRUCK-1",
+        "O-10": "TRUCK-1",
+        "O-NEW-18": "TRUCK-1",
+        "O-5": "TRUCK-1",
+        "O-18": "TRUCK-1",
+        "O-11": "TRUCK-2",
+        "O-4": "TRUCK-2",
+        "O-2": "TRUCK-2",
+        "O-25": "TRUCK-2",
+        "O-14": "TRUCK-2",
+        "O-NEW-17": "TRUCK-2",
+        "O-29": "TRUCK-3",
+        "O-NEW-3": "TRUCK-3",
+        "O-17": "TRUCK-3",
+        "O-19": "TRUCK-3",
+        "O-28": "TRUCK-3",
+        "O-13": "TRUCK-3",
+        "O-6": "TRUCK-3",
+        "O-NEW-2": "TRUCK-3",
+        "O-21": "TRUCK-4",
+        "O-NEW-10": "TRUCK-4",
+        "O-NEW-8": "TRUCK-4",
+        "O-24": "TRUCK-4",
+        "O-30": "TRUCK-4",
+        "O-7": "TRUCK-4"
+      }
+    },
+    {
+      "time": 1036.6302808005514,
+      "solve_time_seconds": 2.0004947499983246,
+      "status": "ROUTING_SUCCESS",
+      "order_vehicle_assignment": {
+        "O-15": "TRUCK-1",
+        "O-22": "TRUCK-1",
+        "O-NEW-11": "TRUCK-1",
+        "O-3": "TRUCK-1",
+        "O-10": "TRUCK-1",
+        "O-NEW-18": "TRUCK-1",
+        "O-5": "TRUCK-1",
+        "O-18": "TRUCK-1",
+        "O-NEW-4": "TRUCK-1",
+        "O-11": "TRUCK-2",
+        "O-4": "TRUCK-2",
+        "O-2": "TRUCK-2",
+        "O-25": "TRUCK-2",
+        "O-14": "TRUCK-2",
+        "O-29": "TRUCK-3",
+        "O-NEW-3": "TRUCK-3",
+        "O-17": "TRUCK-3",
+        "O-19": "TRUCK-3",
+        "O-28": "TRUCK-3",
+        "O-13": "TRUCK-3",
+        "O-6": "TRUCK-3",
+        "O-NEW-2": "TRUCK-3",
+        "O-21": "TRUCK-4",
+        "O-NEW-10": "TRUCK-4",
+        "O-NEW-8": "TRUCK-4",
+        "O-24": "TRUCK-4",
+        "O-30": "TRUCK-4",
+        "O-7": "TRUCK-4",
+        "O-NEW-17": "TRUCK-4"
+      }
+    },
+    {
+      "time": 1197.172470493676,
+      "solve_time_seconds": 2.000423541998316,
+      "status": "ROUTING_SUCCESS",
+      "order_vehicle_assignment": {
+        "O-22": "TRUCK-1",
+        "O-NEW-11": "TRUCK-1",
+        "O-3": "TRUCK-1",
+        "O-10": "TRUCK-1",
+        "O-NEW-18": "TRUCK-1",
+        "O-5": "TRUCK-1",
+        "O-18": "TRUCK-1",
+        "O-NEW-4": "TRUCK-1",
+        "O-4": "TRUCK-2",
+        "O-2": "TRUCK-2",
+        "O-25": "TRUCK-2",
+        "O-14": "TRUCK-2",
+        "O-NEW-3": "TRUCK-3",
+        "O-17": "TRUCK-3",
+        "O-19": "TRUCK-3",
+        "O-28": "TRUCK-3",
+        "O-6": "TRUCK-3",
+        "O-NEW-2": "TRUCK-3",
+        "O-13": "TRUCK-3",
+        "O-NEW-20": "TRUCK-3",
+        "O-NEW-10": "TRUCK-4",
+        "O-NEW-8": "TRUCK-4",
+        "O-24": "TRUCK-4",
+        "O-30": "TRUCK-4",
+        "O-7": "TRUCK-4",
+        "O-NEW-17": "TRUCK-4"
+      }
+    },
+    {
+      "time": 1489.6723124095745,
+      "solve_time_seconds": 2.00040120799531,
+      "status": "ROUTING_SUCCESS",
+      "order_vehicle_assignment": {
+        "O-3": "TRUCK-1",
+        "O-10": "TRUCK-1",
+        "O-NEW-18": "TRUCK-1",
+        "O-5": "TRUCK-1",
+        "O-18": "TRUCK-1",
+        "O-NEW-4": "TRUCK-1",
+        "O-4": "TRUCK-2",
+        "O-2": "TRUCK-2",
+        "O-25": "TRUCK-2",
+        "O-14": "TRUCK-2",
+        "O-NEW-1": "TRUCK-2",
+        "O-17": "TRUCK-3",
+        "O-19": "TRUCK-3",
+        "O-28": "TRUCK-3",
+        "O-6": "TRUCK-3",
+        "O-NEW-2": "TRUCK-3",
+        "O-13": "TRUCK-3",
+        "O-NEW-20": "TRUCK-3",
+        "O-NEW-8": "TRUCK-4",
+        "O-24": "TRUCK-4",
+        "O-30": "TRUCK-4",
+        "O-7": "TRUCK-4",
+        "O-NEW-17": "TRUCK-4"
+      }
+    },
+    {
+      "time": 1751.5086185627665,
+      "solve_time_seconds": 2.0004077080011484,
+      "status": "ROUTING_SUCCESS",
+      "order_vehicle_assignment": {
+        "O-10": "TRUCK-1",
+        "O-NEW-18": "TRUCK-1",
+        "O-NEW-6": "TRUCK-1",
+        "O-5": "TRUCK-1",
+        "O-18": "TRUCK-1",
+        "O-14": "TRUCK-2",
+        "O-19": "TRUCK-3",
+        "O-28": "TRUCK-3",
+        "O-6": "TRUCK-3",
+        "O-NEW-2": "TRUCK-3",
+        "O-13": "TRUCK-3",
+        "O-NEW-20": "TRUCK-3",
+        "O-NEW-4": "TRUCK-3",
+        "O-24": "TRUCK-4",
+        "O-30": "TRUCK-4",
+        "O-7": "TRUCK-4",
+        "O-NEW-17": "TRUCK-4",
+        "O-NEW-1": "TRUCK-4"
+      }
+    },
+    {
+      "time": 1866.57047446613,
+      "solve_time_seconds": 2.000441583004431,
+      "status": "ROUTING_SUCCESS",
+      "order_vehicle_assignment": {
+        "O-NEW-18": "TRUCK-1",
+        "O-NEW-6": "TRUCK-1",
+        "O-5": "TRUCK-1",
+        "O-18": "TRUCK-1",
+        "O-14": "TRUCK-2",
+        "O-19": "TRUCK-3",
+        "O-28": "TRUCK-3",
+        "O-6": "TRUCK-3",
+        "O-NEW-2": "TRUCK-3",
+        "O-13": "TRUCK-3",
+        "O-NEW-20": "TRUCK-3",
+        "O-NEW-4": "TRUCK-3",
+        "O-30": "TRUCK-4",
+        "O-NEW-7": "TRUCK-4",
+        "O-7": "TRUCK-4",
+        "O-NEW-17": "TRUCK-4",
+        "O-NEW-1": "TRUCK-4"
+      }
+    },
+    {
+      "time": 1882.0542679648731,
+      "solve_time_seconds": 2.0009400410053786,
+      "status": "ROUTING_SUCCESS",
+      "order_vehicle_assignment": {
+        "O-NEW-18": "TRUCK-1",
+        "O-NEW-6": "TRUCK-1",
+        "O-5": "TRUCK-1",
+        "O-18": "TRUCK-1",
+        "O-14": "TRUCK-2",
+        "O-19": "TRUCK-3",
+        "O-NEW-9": "TRUCK-3",
+        "O-28": "TRUCK-3",
+        "O-6": "TRUCK-3",
+        "O-NEW-2": "TRUCK-3",
+        "O-13": "TRUCK-3",
+        "O-NEW-20": "TRUCK-3",
+        "O-30": "TRUCK-4",
+        "O-NEW-7": "TRUCK-4",
+        "O-7": "TRUCK-4",
+        "O-NEW-17": "TRUCK-4",
+        "O-NEW-1": "TRUCK-4",
+        "O-NEW-4": "TRUCK-4"
+      }
+    },
+    {
+      "time": 2173.512649639035,
+      "solve_time_seconds": 2.0003763749991776,
+      "status": "ROUTING_SUCCESS",
+      "order_vehicle_assignment": {
+        "O-NEW-6": "TRUCK-1",
+        "O-14": "TRUCK-2",
+        "O-NEW-17": "TRUCK-2",
+        "O-5": "TRUCK-2",
+        "O-18": "TRUCK-2",
+        "O-NEW-9": "TRUCK-3",
+        "O-28": "TRUCK-3",
+        "O-6": "TRUCK-3",
+        "O-NEW-2": "TRUCK-3",
+        "O-13": "TRUCK-3",
+        "O-NEW-20": "TRUCK-3",
+        "O-NEW-4": "TRUCK-3",
+        "O-30": "TRUCK-4",
+        "O-NEW-16": "TRUCK-4",
+        "O-NEW-7": "TRUCK-4",
+        "O-7": "TRUCK-4",
+        "O-NEW-1": "TRUCK-4"
+      }
+    },
+    {
+      "time": 2289.1956824565186,
+      "solve_time_seconds": 2.000390375003917,
+      "status": "ROUTING_SUCCESS",
+      "order_vehicle_assignment": {
+        "O-NEW-6": "TRUCK-1",
+        "O-14": "TRUCK-2",
+        "O-NEW-17": "TRUCK-2",
+        "O-5": "TRUCK-2",
+        "O-18": "TRUCK-2",
+        "O-28": "TRUCK-3",
+        "O-6": "TRUCK-3",
+        "O-NEW-2": "TRUCK-3",
+        "O-13": "TRUCK-3",
+        "O-NEW-20": "TRUCK-3",
+        "O-NEW-4": "TRUCK-3",
+        "O-NEW-16": "TRUCK-4",
+        "O-NEW-15": "TRUCK-4",
+        "O-NEW-7": "TRUCK-4",
+        "O-7": "TRUCK-4",
+        "O-NEW-1": "TRUCK-4"
+      }
+    },
+    {
+      "time": 2352.480792249261,
+      "solve_time_seconds": 2.0004479589988478,
+      "status": "ROUTING_SUCCESS",
+      "order_vehicle_assignment": {
+        "O-NEW-6": "TRUCK-1",
+        "O-14": "TRUCK-2",
+        "O-NEW-17": "TRUCK-2",
+        "O-5": "TRUCK-2",
+        "O-18": "TRUCK-2",
+        "O-28": "TRUCK-3",
+        "O-NEW-19": "TRUCK-3",
+        "O-6": "TRUCK-3",
+        "O-NEW-2": "TRUCK-3",
+        "O-13": "TRUCK-3",
+        "O-NEW-20": "TRUCK-3",
+        "O-NEW-4": "TRUCK-3",
+        "O-NEW-16": "TRUCK-4",
+        "O-NEW-15": "TRUCK-4",
+        "O-NEW-7": "TRUCK-4",
+        "O-7": "TRUCK-4",
+        "O-NEW-1": "TRUCK-4"
+      }
+    },
+    {
+      "time": 2353.3823935517303,
+      "solve_time_seconds": 2.0003839999990305,
+      "status": "ROUTING_SUCCESS",
+      "order_vehicle_assignment": {
+        "O-NEW-6": "TRUCK-1",
+        "O-5": "TRUCK-1",
+        "O-18": "TRUCK-1",
+        "O-14": "TRUCK-2",
+        "O-NEW-12": "TRUCK-2",
+        "O-NEW-1": "TRUCK-2",
+        "O-28": "TRUCK-3",
+        "O-NEW-19": "TRUCK-3",
+        "O-6": "TRUCK-3",
+        "O-NEW-2": "TRUCK-3",
+        "O-13": "TRUCK-3",
+        "O-NEW-20": "TRUCK-3",
+        "O-NEW-4": "TRUCK-3",
+        "O-NEW-16": "TRUCK-4",
+        "O-NEW-15": "TRUCK-4",
+        "O-NEW-7": "TRUCK-4",
+        "O-7": "TRUCK-4",
+        "O-NEW-17": "TRUCK-4"
+      }
+    },
+    {
+      "time": 2709.289334539036,
+      "solve_time_seconds": 2.000438540999312,
+      "status": "ROUTING_SUCCESS",
+      "order_vehicle_assignment": {
+        "O-NEW-6": "TRUCK-1",
+        "O-5": "TRUCK-1",
+        "O-18": "TRUCK-1",
+        "O-NEW-12": "TRUCK-2",
+        "O-NEW-19": "TRUCK-3",
+        "O-6": "TRUCK-3",
+        "O-NEW-2": "TRUCK-3",
+        "O-13": "TRUCK-3",
+        "O-NEW-20": "TRUCK-3",
+        "O-NEW-4": "TRUCK-3",
+        "O-NEW-15": "TRUCK-4",
+        "O-NEW-7": "TRUCK-4",
+        "O-7": "TRUCK-4",
+        "O-NEW-14": "TRUCK-4",
+        "O-NEW-17": "TRUCK-4",
+        "O-NEW-1": "TRUCK-4"
+      }
+    },
+    {
+      "time": 2733.308993590987,
+      "solve_time_seconds": 2.0012623329967028,
+      "status": "ROUTING_SUCCESS",
+      "order_vehicle_assignment": {
+        "O-NEW-6": "TRUCK-1",
+        "O-5": "TRUCK-1",
+        "O-18": "TRUCK-1",
+        "O-NEW-17": "TRUCK-1",
+        "O-NEW-12": "TRUCK-2",
+        "O-NEW-19": "TRUCK-3",
+        "O-6": "TRUCK-3",
+        "O-NEW-2": "TRUCK-3",
+        "O-13": "TRUCK-3",
+        "O-NEW-20": "TRUCK-3",
+        "O-NEW-4": "TRUCK-3",
+        "O-NEW-1": "TRUCK-3",
+        "O-NEW-15": "TRUCK-4",
+        "O-NEW-7": "TRUCK-4",
+        "O-7": "TRUCK-4",
+        "O-NEW-14": "TRUCK-4",
+        "O-NEW-5": "TRUCK-4"
+      }
+    }
+  ]
+}

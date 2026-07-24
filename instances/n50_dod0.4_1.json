@@ -1,0 +1,285 @@
+{
+  "scenario_id": "n50_dod0.4",
+  "seed": 1,
+  "total_customers": 50,
+  "degree_of_dynamism": 0.4,
+  "num_vehicles": 4,
+  "alpha": 0.75,
+  "static_customers": [
+    {
+      "id": "CUSTOMER 1",
+      "x": -54,
+      "y": 24
+    },
+    {
+      "id": "CUSTOMER 2",
+      "x": 511,
+      "y": 901
+    },
+    {
+      "id": "CUSTOMER 3",
+      "x": -931,
+      "y": -712
+    },
+    {
+      "id": "CUSTOMER 4",
+      "x": 646,
+      "y": 898
+    },
+    {
+      "id": "CUSTOMER 5",
+      "x": -502,
+      "y": -377
+    },
+    {
+      "id": "CUSTOMER 6",
+      "x": 738,
+      "y": -153
+    },
+    {
+      "id": "CUSTOMER 7",
+      "x": -454,
+      "y": 656
+    },
+    {
+      "id": "CUSTOMER 8",
+      "x": -486,
+      "y": -182
+    },
+    {
+      "id": "CUSTOMER 9",
+      "x": 288,
+      "y": 99
+    },
+    {
+      "id": "CUSTOMER 10",
+      "x": -829,
+      "y": -945
+    },
+    {
+      "id": "CUSTOMER 11",
+      "x": 732,
+      "y": 507
+    },
+    {
+      "id": "CUSTOMER 12",
+      "x": 676,
+      "y": 76
+    },
+    {
+      "id": "CUSTOMER 13",
+      "x": 635,
+      "y": -341
+    },
+    {
+      "id": "CUSTOMER 14",
+      "x": -95,
+      "y": 577
+    },
+    {
+      "id": "CUSTOMER 15",
+      "x": -753,
+      "y": -394
+    },
+    {
+      "id": "CUSTOMER 16",
+      "x": -752,
+      "y": -93
+    },
+    {
+      "id": "CUSTOMER 17",
+      "x": 954,
+      "y": -732
+    },
+    {
+      "id": "CUSTOMER 18",
+      "x": -233,
+      "y": -194
+    },
+    {
+      "id": "CUSTOMER 19",
+      "x": 808,
+      "y": -593
+    },
+    {
+      "id": "CUSTOMER 20",
+      "x": 5,
+      "y": -476
+    },
+    {
+      "id": "CUSTOMER 21",
+      "x": -961,
+      "y": 501
+    },
+    {
+      "id": "CUSTOMER 22",
+      "x": -876,
+      "y": -439
+    },
+    {
+      "id": "CUSTOMER 23",
+      "x": -4,
+      "y": -30
+    },
+    {
+      "id": "CUSTOMER 24",
+      "x": -767,
+      "y": 962
+    },
+    {
+      "id": "CUSTOMER 25",
+      "x": 498,
+      "y": 924
+    },
+    {
+      "id": "CUSTOMER 26",
+      "x": -816,
+      "y": 450
+    },
+    {
+      "id": "CUSTOMER 27",
+      "x": -414,
+      "y": 82
+    },
+    {
+      "id": "CUSTOMER 28",
+      "x": 850,
+      "y": -446
+    },
+    {
+      "id": "CUSTOMER 29",
+      "x": 452,
+      "y": -679
+    },
+    {
+      "id": "CUSTOMER 30",
+      "x": -355,
+      "y": 940
+    }
+  ],
+  "dynamic_customers": [
+    {
+      "id": "CUSTOMER NEW 1",
+      "x": 77,
+      "y": 134,
+      "release_date": 1489.6723124095745
+    },
+    {
+      "id": "CUSTOMER NEW 2",
+      "x": 648,
+      "y": -139,
+      "release_date": 950.1950640525496
+    },
+    {
+      "id": "CUSTOMER NEW 3",
+      "x": 534,
+      "y": -812,
+      "release_date": 1021.6010165609473
+    },
+    {
+      "id": "CUSTOMER NEW 4",
+      "x": 58,
+      "y": -304,
+      "release_date": 1036.6302808005514
+    },
+    {
+      "id": "CUSTOMER NEW 5",
+      "x": -974,
+      "y": 243,
+      "release_date": 2733.308993590987
+    },
+    {
+      "id": "CUSTOMER NEW 6",
+      "x": -71,
+      "y": -957,
+      "release_date": 1751.5086185627665
+    },
+    {
+      "id": "CUSTOMER NEW 7",
+      "x": -403,
+      "y": 750,
+      "release_date": 1866.57047446613
+    },
+    {
+      "id": "CUSTOMER NEW 8",
+      "x": -856,
+      "y": 708,
+      "release_date": 913.3593153286653
+    },
+    {
+      "id": "CUSTOMER NEW 9",
+      "x": 772,
+      "y": -912,
+      "release_date": 1882.0542679648731
+    },
+    {
+      "id": "CUSTOMER NEW 10",
+      "x": -733,
+      "y": 605,
+      "release_date": 340.3951628524913
+    },
+    {
+      "id": "CUSTOMER NEW 11",
+      "x": -910,
+      "y": -631,
+      "release_date": 143.1897233952316
+    },
+    {
+      "id": "CUSTOMER NEW 12",
+      "x": 610,
+      "y": 391,
+      "release_date": 2353.3823935517303
+    },
+    {
+      "id": "CUSTOMER NEW 13",
+      "x": 39,
+      "y": -690,
+      "release_date": 24.624141614864545
+    },
+    {
+      "id": "CUSTOMER NEW 14",
+      "x": -569,
+      "y": 383,
+      "release_date": 2709.289334539036
+    },
+    {
+      "id": "CUSTOMER NEW 15",
+      "x": -478,
+      "y": 918,
+      "release_date": 2289.1956824565186
+    },
+    {
+      "id": "CUSTOMER NEW 16",
+      "x": -126,
+      "y": 970,
+      "release_date": 2173.512649639035
+    },
+    {
+      "id": "CUSTOMER NEW 17",
+      "x": -345,
+      "y": 327,
+      "release_date": 133.09807510639894
+    },
+    {
+      "id": "CUSTOMER NEW 18",
+      "x": -627,
+      "y": -673,
+      "release_date": 574.2047583231639
+    },
+    {
+      "id": "CUSTOMER NEW 19",
+      "x": 783,
+      "y": -210,
+      "release_date": 2352.480792249261
+    },
+    {
+      "id": "CUSTOMER NEW 20",
+      "x": 509,
+      "y": -444,
+      "release_date": 1197.172470493676
+    }
+  ],
+  "D_offline": 14387.580645947017,
+  "T_offline": 3690.7493862179076,
+  "T_op": 2768.062039663431
+}
