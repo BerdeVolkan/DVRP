@@ -7,10 +7,11 @@ from DVRP_utils import ENV_RNG, NEW_EVENT_TIME_RNG, NEW_COORD_RNG, SIMULATION_HO
 
 class DemoModel(Model):
 
-    def __init__(self, num_dynamic_events: int) -> None:
+    def __init__(self, num_dynamic_events: int, solver_config: str = "baseline") -> None:
         super().__init__()
         self.num_dynamic_events = num_dynamic_events
         self.dynamic_events_count = 0
+        self.solver_config = solver_config
 
     def setup_events(self) -> None:
         """Plant die Zeitpunkte der dynamischen Kundenereignisse innerhalb von [0, SIMULATION_HORIZON)."""
@@ -55,7 +56,7 @@ class DemoModel(Model):
         """
         state = self.get_state()
         #print(self._locations) # dict mit Key Location zb Depot und Value Location object
-        return DVRP_algo.routing_algorithm(state, self._locations)
+        return DVRP_algo.routing_algorithm(state, self._locations, solver_config=self.solver_config)
 
 
 if __name__ == '__main__':

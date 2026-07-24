@@ -4,6 +4,7 @@ from ortools.constraint_solver import routing_enums_pb2
 from ortools.constraint_solver import pywrapcp
 from typing import Any
 from pprint import pprint
+from DVRP_solver_configs import SOLVER_CONFIGS, DEFAULT_SOLVER_CONFIG
 
 def travel_time_calc(origin: Location, destination: Location) -> float:
     return euclidean_distance(origin.x, origin.y, destination.x, destination.y)
@@ -82,10 +83,19 @@ def print_distance(data, manager, routing, solution):
         print(plan_output)
 
 
-def solve_vrp_with_ortools(locations: dict, distance_location: dict, state: dict, num_vehicles: int) -> list[list[str]]:
+def solve_vrp_with_ortools(
+    locations: dict,
+    distance_location: dict,
+    state: dict,
+    num_vehicles: int,
+    first_solution_strategy: int = routing_enums_pb2.FirstSolutionStrategy.PARALLEL_CHEAPEST_INSERTION,
+    local_search_metaheuristic: int = routing_enums_pb2.LocalSearchMetaheuristic.GUIDED_LOCAL_SEARCH,
+    time_limit_seconds: float = 2,
+    span_cost_coefficient: int = 10,
+) -> list[list[str]]:
     """
     Löst VRP mit OR-Tools und gibt Routen als Location-IDs zurück
-    
+
     Returns:
         Liste von Routen, z.B. [['DEPOT', 'CUSTOMER 1', 'DEPOT'], ['DEPOT', 'CUSTOMER 2', 'DEPOT']]
     """
@@ -157,20 +167,18 @@ def solve_vrp_with_ortools(locations: dict, distance_location: dict, state: dict
     )
 
     distance_dimension = routing.GetDimensionOrDie(dimension_name)
-    distance_dimension.SetGlobalSpanCostCoefficient(10)
-    
+    distance_dimension.SetGlobalSpanCostCoefficient(span_cost_coefficient)
+
     # Suchparameter
     search_parameters = pywrapcp.DefaultRoutingSearchParameters()
-    search_parameters.first_solution_strategy = (
-        routing_enums_pb2.FirstSolutionStrategy.PARALLEL_CHEAPEST_INSERTION
-    )
+    search_parameters.first_solution_strategy = first_solution_strategy
+    search_parameters.local_search_metaheuristic = local_search_metaheuristic
 
-    search_parameters.local_search_metaheuristic = (
-        routing_enums_pb2.LocalSearchMetaheuristic.GUIDED_LOCAL_SEARCH
-    )
+    # time_limit ist ein google.protobuf.Duration (Felder: seconds, nanos)
+    time_limit_seconds_int = int(time_limit_seconds)
+    search_parameters.time_limit.seconds = time_limit_seconds_int
+    search_parameters.time_limit.nanos = int(round((time_limit_seconds - time_limit_seconds_int) * 1e9))
 
-    search_parameters.time_limit.seconds = 2
-    
     # Löse Problem
     solution = routing.SolveWithParameters(search_parameters)
     
@@ -300,7 +308,13 @@ def convert_ortools_solution_to_dvrp(routes: list[list[str]], state: dict,
     }
 
 
-def routing_algorithm(state: dict[str, Any], locations: dict) -> dict[str, Any]:
+def routing_algorithm(
+    state: dict[str, Any],
+    locations: dict,
+    solver_config: str = DEFAULT_SOLVER_CONFIG,
+    time_limit_seconds: float = 2,
+    span_cost_coefficient: int = 10,
+) -> dict[str, Any]:
     """
     Hauptroutingalgorithmus mit OR-Tools
     """
@@ -348,7 +362,17 @@ def routing_algorithm(state: dict[str, Any], locations: dict) -> dict[str, Any]:
 
     # Löse mit OR-Tools
     num_vehicles = len(all_vehicles)
-    routes = solve_vrp_with_ortools(routing_locations, distance_location, state, num_vehicles)
-    
+    config = SOLVER_CONFIGS[solver_config]
+    routes = solve_vrp_with_ortools(
+        routing_locations,
+        distance_location,
+        state,
+        num_vehicles,
+        first_solution_strategy=config["first_solution_strategy"],
+        local_search_metaheuristic=config["local_search_metaheuristic"],
+        time_limit_seconds=time_limit_seconds,
+        span_cost_coefficient=span_cost_coefficient,
+    )
+
     # Konvertiere zu DVRP Format
     return convert_ortools_solution_to_dvrp(routes, state, locations)
