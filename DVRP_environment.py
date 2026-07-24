@@ -60,9 +60,13 @@ class DemoModel(Model):
 
 if __name__ == '__main__':
 
-    num_new_customers = 3
+    total_customers = 20
+    degree_of_dynamism = 0.7 # Anteil der Kunden, die dynamisch (über die Zeit) hinzugefügt werden
 
-    model = DemoModel(num_dynamic_events=num_new_customers)
+    num_dynamic_customers = round(total_customers * degree_of_dynamism)
+    num_static_customers = total_customers - num_dynamic_customers
+
+    model = DemoModel(num_dynamic_events=num_dynamic_customers)
 
     # Erstelle Depot
     depot = Location(id='DEPOT', x=0, y=0)
@@ -70,7 +74,7 @@ if __name__ == '__main__':
     model.add_location(depot)
 
     # Erstelle Kunden mit zufälligen Koordinaten
-    for i in range(20):
+    for i in range(num_static_customers):
         x = ENV_RNG.integers(-1000, 1001)
         y = ENV_RNG.integers(-1000, 1001)
 
