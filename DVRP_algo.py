@@ -1,4 +1,4 @@
-from dvrpsim import Location
+from dvrpsim import Location, Order
 from dvrpsim.utils.distances import euclidean_distance
 from ortools.constraint_solver import routing_enums_pb2
 from ortools.constraint_solver import pywrapcp
@@ -198,7 +198,116 @@ def solve_vrp_with_ortools(
         return []
 
 
-def convert_ortools_solution_to_dvrp(routes: list[list[str]], state: dict, 
+def solve_offline_reference(
+    locations: dict,
+    orders: list[Order],
+    num_vehicles: int,
+    time_limit_seconds: float,
+) -> dict[str, Any]:
+    """
+    Loest eine statische Offline-Referenzversion des VRP: alle Kunden (statisch
+    und dynamisch) sind bereits ab t=0 bekannt, es findet KEINE Reoptimierung
+    statt, und es gibt keine en-route Fahrzeuge.
+
+    Wiederverwendungs-Entscheidung: solve_vrp_with_ortools() wird direkt
+    wiederverwendet, indem ein kuenstlicher state konstruiert wird, in dem alle
+    Fahrzeuge als IDLE am Depot stehen. Dadurch bleibt extra_start_distance in
+    solve_vrp_with_ortools() leer (keine EN_ROUTE-Fahrzeuge -> keine
+    Zusatzkosten auf dem ersten Arc), was exakt dem gewuenschten Offline-
+    Verhalten entspricht. Eine eigene, schlankere Funktion war nicht noetig, da
+    create_data_model() bereits korrekt Start=Ende=DEPOT ableitet, solange
+    'DEPOT' der erste Key im locations-dict ist (hier immer der Fall).
+
+    Empfohlene time_limit_seconds (baseline-Preset, grosszuegiges Zeitlimit):
+        n=20 Kunden:  15-30 Sekunden
+        n=50 Kunden:  30-60 Sekunden
+        n=100 Kunden: 60-120 Sekunden
+
+    Args:
+        locations:          dict aller Locations (inkl. 'DEPOT' als erster Key)
+        orders:              Liste aller Order-Objekte (pickup_location muss in
+                             `locations` enthalten sein; delivery_location ist
+                             fuer alle Auftraege das Depot)
+        num_vehicles:        Anzahl verfuegbarer Fahrzeuge
+        time_limit_seconds:  Zeitlimit fuer den OR-Tools Solver
+
+    Returns:
+        dict mit 'D_offline' (Gesamtdistanz), 'T_offline' (Makespan) und
+        'routes' (Liste von Location-ID Routen je Fahrzeug)
+    """
+    state = {
+        'time': 0,
+        'vehicles': {
+            f'TRUCK-{v + 1}': {
+                'status': 'IDLE',
+                'current_visit': {'location': 'DEPOT'},
+                'next_visits': [],
+                'loaded_orders': [],
+                'previous_visit': None,
+            }
+            for v in range(num_vehicles)
+        },
+    }
+
+    config = SOLVER_CONFIGS['baseline']
+    routes = solve_vrp_with_ortools(
+        locations,
+        locations,
+        state,
+        num_vehicles,
+        first_solution_strategy=config['first_solution_strategy'],
+        local_search_metaheuristic=config['local_search_metaheuristic'],
+        time_limit_seconds=time_limit_seconds,
+    )
+
+    # D_offline: Summe aller gefahrenen Kantenlaengen ueber alle Fahrzeugrouten
+    D_offline = 0.0
+    for route in routes:
+        for a, b in zip(route, route[1:]):
+            D_offline += travel_time_calc(locations[a], locations[b])
+
+    # Lookup: pickup_location-ID -> Order (fuer pickup_duration je Kunde)
+    order_by_pickup_location = {order.pickup_location.id: order for order in orders}
+
+    # T_offline: Makespan (Maximum) ueber die Fertigstellungszeiten aller Fahrzeuge.
+    #
+    # ANNAHME zur gleichzeitigen Zustellung am Depot (empirisch mit einem
+    # dvrpsim-Testlauf UND per Quellcode von dvrpsim.elements.vehicle.Vehicle._service
+    # verifiziert, siehe dortige for-Schleife ueber current_visit.delivery_list):
+    # Werden mehrere Auftraege vom selben Fahrzeug gleichzeitig am Depot
+    # zugestellt, geschieht dies SEQUENZIELL (ein yield medium_timeout pro
+    # Auftrag, nacheinander) und NICHT parallel. delivery_duration wird daher
+    # pro Auftrag am Depot aufaddiert, nicht nur einmal angesetzt.
+    T_offline = 0.0
+    for route in routes:
+        time_elapsed = 0.0
+        orders_on_board: list[Order] = []
+
+        for idx, loc_id in enumerate(route):
+            if idx > 0:
+                time_elapsed += travel_time_calc(locations[route[idx - 1]], locations[loc_id])
+
+            if loc_id == 'DEPOT':
+                if idx > 0:
+                    # sequenzielle Zustellung aller mitgefuehrten Auftraege
+                    for order in orders_on_board:
+                        time_elapsed += order.delivery_duration
+                    orders_on_board = []
+            elif loc_id in order_by_pickup_location:
+                order = order_by_pickup_location[loc_id]
+                time_elapsed += order.pickup_duration
+                orders_on_board.append(order)
+
+        T_offline = max(T_offline, time_elapsed)
+
+    return {
+        'D_offline': D_offline,
+        'T_offline': T_offline,
+        'routes': routes,
+    }
+
+
+def convert_ortools_solution_to_dvrp(routes: list[list[str]], state: dict,
                                      locations: dict) -> dict[str, Any]:
     """
     Konvertiert OR-Tools Routen ins DVRP-Format
