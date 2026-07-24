@@ -61,7 +61,7 @@ class DemoModel(Model):
 if __name__ == '__main__':
 
     total_customers = 20
-    degree_of_dynamism = 0.7 # Anteil der Kunden, die dynamisch (über die Zeit) hinzugefügt werden
+    degree_of_dynamism = 0.1 # Anteil der Kunden, die dynamisch (über die Zeit) hinzugefügt werden
 
     num_dynamic_customers = round(total_customers * degree_of_dynamism)
     num_static_customers = total_customers - num_dynamic_customers
