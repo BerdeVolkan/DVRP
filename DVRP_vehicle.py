@@ -20,18 +20,6 @@ class Truck(Vehicle):
 
     def on_arrival(self) -> None:
         super().on_arrival()
-
-        # Tatsaechlich gefahrene Strecke (Euklidisch, wie DVRP_algo.travel_time_calc)
-        # erfassen - NICHT aus OR-Tools-internen Kosten uebernehmen, da
-        # solve_vrp_with_ortools fuer en-route-Fahrzeuge kuenstliche
-        # Zusatzkosten auf den ersten Arc addiert.
-        distance = euclidean_distance(
-            self.previous_location.x, self.previous_location.y,
-            self.current_location.x, self.current_location.y,
-        )
-        vehicle_log = self.model.run_log['vehicles'].setdefault(self.id, {'total_distance': 0.0})
-        vehicle_log['total_distance'] += distance
-
         if self.is_idle:
             self.model.request_for_routing()
 

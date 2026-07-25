@@ -12,6 +12,9 @@ VEHICLE_RNG = np.random.default_rng(44)
 # Generator für die Koordinaten der neuen dynamischen Kunden
 NEW_COORD_RNG = np.random.default_rng(46)
 
+# Oberes Zeitlimit, innerhalb dessen dynamische Kunden ausgelöst werden dürfen
+SIMULATION_HORIZON = 5000
+
 def set_all_seeds(seed):
     """Ermöglicht es, die gesamte Simulation mit einer Basis-Zahl zu steuern"""
     global ENV_RNG, NEW_EVENT_TIME_RNG, VEHICLE_RNG, NEW_COORD_RNG
