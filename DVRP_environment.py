@@ -1,52 +1,56 @@
-from dvrpsim import Model, Location, Order
+from dvrpsim import Model, Location, Order, Vehicle
 from simpy import Resource
-from typing import Any, Generator
 import DVRP_algo
 import DVRP_vehicle
-from DVRP_utils import ENV_RNG, NEW_EVENT_TIME_RNG, NEW_COORD_RNG, SIMULATION_HORIZON
+from DVRP_utils import ENV_RNG, NEW_CUSTOMER_RNG, NEW_COORD_RNG
 
 class DemoModel(Model):
+
+    def on_vehicle_arrival(self, vehicle: Vehicle) -> None:
+        loc_id = vehicle.current_location.id
+        
+        if loc_id in self.trigger_customers:
+            # Event auslösen
+            self.dynamic_events_count += 1
+            # Den Trigger entfernen
+            self.trigger_customers.remove(loc_id)
+            
+            new_id = f'CUSTOMER NEW {self.dynamic_events_count}'
+            
+            x_new = NEW_COORD_RNG.integers(-1000, 1001)
+            y_new = NEW_COORD_RNG.integers(-1000, 1001)
+            
+            # Location und Order erstellen
+            new_loc = Location(id=new_id, x=x_new, y=y_new)
+            self.add_location(new_loc)
+            
+            order_new = Order(id=f'O-NEW-{self.dynamic_events_count}')
+            order_new.pickup_location = new_loc
+            order_new.delivery_location = self._locations['DEPOT']
+
+            order_new.release_date = self.env.now
+            order_new.pickup_duration = 2
+            order_new.delivery_duration = 3
+            
+            self.request_order(order_new, decision_point_on_request=True)
 
     def __init__(self, num_dynamic_events: int) -> None:
         super().__init__()
         self.num_dynamic_events = num_dynamic_events
+        self.trigger_customers = [] # Liste der IDs, die ein Event auslösen
         self.dynamic_events_count = 0
 
-    def setup_events(self) -> None:
-        """Plant die Zeitpunkte der dynamischen Kundenereignisse innerhalb von [0, SIMULATION_HORIZON)."""
-        event_times = NEW_EVENT_TIME_RNG.uniform(0, SIMULATION_HORIZON, size=self.num_dynamic_events)
-
-        for trigger_time in event_times:
-            self.env.process(self._dynamic_customer_proc(trigger_time))
-
-    def _dynamic_customer_proc(self, trigger_time: float) -> Generator[Any, Any, None]:
-        delay = trigger_time - self.env.now
-        if delay > 0:
-            yield self.env.timeout(delay)
-
-        self._spawn_dynamic_customer()
-
-    def _spawn_dynamic_customer(self) -> None:
-        self.dynamic_events_count += 1
-
-        new_id = f'CUSTOMER NEW {self.dynamic_events_count}'
-
-        x_new = NEW_COORD_RNG.integers(-1000, 1001)
-        y_new = NEW_COORD_RNG.integers(-1000, 1001)
-
-        # Location und Order erstellen
-        new_loc = Location(id=new_id, x=x_new, y=y_new)
-        self.add_location(new_loc)
-
-        order_new = Order(id=f'O-NEW-{self.dynamic_events_count}')
-        order_new.pickup_location = new_loc
-        order_new.delivery_location = self._locations['DEPOT']
-
-        order_new.release_date = self.env.now
-        order_new.pickup_duration = 2
-        order_new.delivery_duration = 3
-
-        self.request_order(order_new, decision_point_on_request=True)
+    def setup_events(self):
+        # Alle vorhandenen Kunden IDs
+        all_customer_ids = [cid for cid in self._locations.keys() if cid != 'DEPOT']
+        
+        # Wählen zufällig n Kunden aus, die ein Event auslösen sollen
+        if len(all_customer_ids) >= self.num_dynamic_events:
+            self.trigger_customers = NEW_CUSTOMER_RNG.choice(
+                all_customer_ids, 
+                size=self.num_dynamic_events, 
+                replace=False
+            ).tolist()
 
     def routing_callback(self):
         """
@@ -60,13 +64,9 @@ class DemoModel(Model):
 
 if __name__ == '__main__':
 
-    total_customers = 20
-    degree_of_dynamism = 0.1 # Anteil der Kunden, die dynamisch (über die Zeit) hinzugefügt werden
+    num_new_customers = 3
 
-    num_dynamic_customers = round(total_customers * degree_of_dynamism)
-    num_static_customers = total_customers - num_dynamic_customers
-
-    model = DemoModel(num_dynamic_events=num_dynamic_customers)
+    model = DemoModel(num_dynamic_events=num_new_customers)
 
     # Erstelle Depot
     depot = Location(id='DEPOT', x=0, y=0)
@@ -74,7 +74,7 @@ if __name__ == '__main__':
     model.add_location(depot)
 
     # Erstelle Kunden mit zufälligen Koordinaten
-    for i in range(num_static_customers):
+    for i in range(20):
         x = ENV_RNG.integers(-1000, 1001)
         y = ENV_RNG.integers(-1000, 1001)
 
