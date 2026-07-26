@@ -117,5 +117,10 @@ if __name__ == '__main__':
 
     print(truck_max_delivery)
 
+    distances = [truck_max_delivery.get(v.id, 0) for v in model.vehicles]
+    n = len(distances)
+    jain_fairness_index = (sum(distances) ** 2) / (n * sum(d ** 2 for d in distances))
+    print(f"Jain's Fairness Index: {jain_fairness_index:.4f}")
+
     print("-" * 80)
     print("Simulation abgeschlossen")
