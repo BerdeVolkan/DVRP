@@ -1,4 +1,5 @@
 from dvrpsim import Model, Location, Order, Vehicle
+from dvrpsim.utils.distances import euclidean_distance
 from simpy import Resource
 import DVRP_algo
 import DVRP_vehicle
@@ -29,8 +30,8 @@ class DemoModel(Model):
             order_new.delivery_location = self._locations['DEPOT']
 
             order_new.release_date = self.env.now
-            order_new.pickup_duration = 2
-            order_new.delivery_duration = 3
+            order_new.pickup_duration = 0
+            order_new.delivery_duration = 0
             
             self.request_order(order_new, decision_point_on_request=True)
 
@@ -87,8 +88,8 @@ if __name__ == '__main__':
         order.pickup_location = customer_location
         order.delivery_location = depot
         order.release_date = 0
-        order.pickup_duration = 2
-        order.delivery_duration = 3
+        order.pickup_duration = 0
+        order.delivery_duration = 0
         model.request_order(order, decision_point_on_request=True)
 
     # Erstelle 4 Fahrzeuge
@@ -106,6 +107,15 @@ if __name__ == '__main__':
 
     # Starte Simulation
     model.run()
-    
+
+    truck_max_delivery = {}
+
+    for order in model.delivered_orders:
+        truck_id = order.pickup_vehicle.id
+        if truck_id not in truck_max_delivery or order.delivery_time > truck_max_delivery[truck_id]:
+            truck_max_delivery[truck_id] = order.delivery_time
+
+    print(truck_max_delivery)
+
     print("-" * 80)
     print("Simulation abgeschlossen")
