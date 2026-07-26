@@ -122,5 +122,7 @@ if __name__ == '__main__':
     jain_fairness_index = (sum(distances) ** 2) / (n * sum(d ** 2 for d in distances))
     print(f"Jain's Fairness Index: {jain_fairness_index:.4f}")
 
+    print(DVRP_algo.solve_times)
+
     print("-" * 80)
     print("Simulation abgeschlossen")

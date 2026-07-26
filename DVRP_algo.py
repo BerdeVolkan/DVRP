@@ -4,6 +4,9 @@ from ortools.constraint_solver import routing_enums_pb2
 from ortools.constraint_solver import pywrapcp
 from typing import Any
 from pprint import pprint
+import time
+
+solve_times = []
 
 def travel_time_calc(origin: Location, destination: Location) -> float:
     return euclidean_distance(origin.x, origin.y, destination.x, destination.y)
@@ -172,7 +175,11 @@ def solve_vrp_with_ortools(locations: dict, distance_location: dict, state: dict
     search_parameters.time_limit.seconds = 2
     
     # Löse Problem
+    start_time = time.perf_counter()
     solution = routing.SolveWithParameters(search_parameters)
+    solve_duration = time.perf_counter() - start_time
+    solve_times.append(solve_duration)
+    #print(f"OR-Tools Lösung in {solve_duration:.4f} Sekunden gefunden")
     
     if solution:
         # Extrahiere Routen als Indizes
