@@ -65,7 +65,7 @@ class DemoModel(Model):
 
 if __name__ == '__main__':
 
-    num_new_customers = 3
+    num_new_customers = 5
 
     model = DemoModel(num_dynamic_events=num_new_customers)
 
@@ -75,7 +75,7 @@ if __name__ == '__main__':
     model.add_location(depot)
 
     # Erstelle Kunden mit zufälligen Koordinaten
-    for i in range(20):
+    for i in range(100):
         x = ENV_RNG.integers(-1000, 1001)
         y = ENV_RNG.integers(-1000, 1001)
 
@@ -123,6 +123,8 @@ if __name__ == '__main__':
     print(f"Jain's Fairness Index: {jain_fairness_index:.4f}")
 
     print(DVRP_algo.solve_times)
+
+    print(DVRP_algo.reassigning_rates)
 
     print("-" * 80)
     print("Simulation abgeschlossen")

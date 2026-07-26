@@ -7,6 +7,8 @@ from pprint import pprint
 import time
 
 solve_times = []
+previous_assignment = None   # order_id -> vehicle_id, Stand der letzten Neuplanung
+reassigning_rates = []       # gesammelte Reassigning-Rate-Werte
 
 def travel_time_calc(origin: Location, destination: Location) -> float:
     return euclidean_distance(origin.x, origin.y, destination.x, destination.y)
@@ -311,6 +313,31 @@ def routing_algorithm(state: dict[str, Any], locations: dict) -> dict[str, Any]:
     """
     Hauptroutingalgorithmus mit OR-Tools
     """
+    global previous_assignment
+
+    # Reassigning Rate: aktuelle Truck-Zuordnung aus dem State bauen
+    current_assignment = {}
+    for order_id, order_info in state['open_orders'].items():
+        if order_info['assigned_vehicle'] is not None:
+            current_assignment[order_id] = order_info['assigned_vehicle']
+
+    if previous_assignment is not None:
+        common_orders = []
+        for order_id in current_assignment:
+            if order_id in previous_assignment:
+                common_orders.append(order_id)
+
+        if len(common_orders) > 0:
+            changed_count = 0
+            for order_id in common_orders:
+                if current_assignment[order_id] != previous_assignment[order_id]:
+                    changed_count += 1
+
+            reassigning_rate = changed_count / len(common_orders)
+            reassigning_rates.append(reassigning_rate)
+
+    previous_assignment = current_assignment
+
     # Sammle nicht delivered Aufträge
     undelivered_orders = [
         order_id for order_id in state['open_orders'].keys()
