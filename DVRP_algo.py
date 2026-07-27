@@ -7,7 +7,6 @@ from pprint import pprint
 import time
 
 solve_times = []
-previous_assignment = None   # order_id -> vehicle_id, Stand der letzten Neuplanung
 reassigning_rates = []       # gesammelte Reassigning-Rate-Werte
 
 def travel_time_calc(origin: Location, destination: Location) -> float:
@@ -192,7 +191,7 @@ def solve_vrp_with_ortools(locations: dict, distance_location: dict, state: dict
         for route in routes_indices:
             route_ids = [data["location_ids"][idx] for idx in route]
             routes_ids.append(route_ids)
-        #print(routes_ids)
+        print(routes_ids)
         return routes_ids
     else:
         print("Keine Lösung gefunden!")
@@ -313,31 +312,11 @@ def routing_algorithm(state: dict[str, Any], locations: dict) -> dict[str, Any]:
     """
     Hauptroutingalgorithmus mit OR-Tools
     """
-    global previous_assignment
-
-    # Reassigning Rate: aktuelle Truck-Zuordnung aus dem State bauen
-    current_assignment = {}
+    # Reassigning Rate: Truck-Zuordnung VOR dieser Neuplanung aus dem State bauen
+    before_assignment = {}
     for order_id, order_info in state['open_orders'].items():
-        if order_info['assigned_vehicle'] is not None:
-            current_assignment[order_id] = order_info['assigned_vehicle']
-
-    if previous_assignment is not None:
-        common_orders = []
-        for order_id in current_assignment:
-            if order_id in previous_assignment:
-                common_orders.append(order_id)
-
-        if len(common_orders) > 0:
-            changed_count = 0
-            for order_id in common_orders:
-                if current_assignment[order_id] != previous_assignment[order_id]:
-                    changed_count += 1
-
-            reassigning_rate = changed_count / len(common_orders)
-            reassigning_rates.append(reassigning_rate)
-
-    previous_assignment = current_assignment
-
+        if order_info['assigned_vehicle'] is not None and order_info['pickup_vehicle'] is None:
+            before_assignment[order_id] = order_info['assigned_vehicle']
     # Sammle nicht delivered Aufträge
     undelivered_orders = [
         order_id for order_id in state['open_orders'].keys()
@@ -385,4 +364,27 @@ def routing_algorithm(state: dict[str, Any], locations: dict) -> dict[str, Any]:
     routes = solve_vrp_with_ortools(routing_locations, distance_location, state, num_vehicles)
     
     # Konvertiere zu DVRP Format
-    return convert_ortools_solution_to_dvrp(routes, state, locations)
+    result = convert_ortools_solution_to_dvrp(routes, state, locations)
+
+    # Reassigning Rate: Truck-Zuordnung NACH dieser Neuplanung aus dem Ergebnis bauen
+    after_assignment = {}
+    for vehicle_id, vehicle_data in result['vehicles'].items():
+        for visit in vehicle_data['next_visits']:
+            if 'delivery_list' in visit:
+                for order_id in visit['delivery_list']:
+                    after_assignment[order_id] = vehicle_id
+    common_orders = []
+    for order_id in after_assignment:
+        if order_id in before_assignment:
+            common_orders.append(order_id)
+
+    if len(common_orders) > 0:
+        changed_count = 0
+        for order_id in common_orders:
+            if after_assignment[order_id] != before_assignment[order_id]:
+                changed_count += 1
+
+        reassigning_rate = changed_count / len(common_orders)
+        reassigning_rates.append(reassigning_rate)
+
+    return result

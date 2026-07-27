@@ -65,7 +65,7 @@ class DemoModel(Model):
 
 if __name__ == '__main__':
 
-    num_new_customers = 5
+    num_new_customers = 4
 
     model = DemoModel(num_dynamic_events=num_new_customers)
 
@@ -75,7 +75,7 @@ if __name__ == '__main__':
     model.add_location(depot)
 
     # Erstelle Kunden mit zufälligen Koordinaten
-    for i in range(100):
+    for i in range(20):
         x = ENV_RNG.integers(-1000, 1001)
         y = ENV_RNG.integers(-1000, 1001)
 
