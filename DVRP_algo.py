@@ -191,7 +191,6 @@ def solve_vrp_with_ortools(locations: dict, distance_location: dict, state: dict
         for route in routes_indices:
             route_ids = [data["location_ids"][idx] for idx in route]
             routes_ids.append(route_ids)
-        print(routes_ids)
         return routes_ids
     else:
         print("Keine Lösung gefunden!")
