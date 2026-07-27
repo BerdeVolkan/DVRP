@@ -1,57 +1,43 @@
-from dvrpsim import Model, Location, Order, Vehicle
+from dvrpsim import Model, Location, Order
 from dvrpsim.utils.distances import euclidean_distance
+from dvrpsim.utils.order_providers import order_provider
 from simpy import Resource
 import DVRP_algo
 import DVRP_vehicle
-from DVRP_utils import ENV_RNG, NEW_CUSTOMER_RNG, NEW_COORD_RNG
+from DVRP_utils import ENV_RNG, NEW_COORD_RNG, NEW_TIME_RNG
 
 class DemoModel(Model):
 
-    def on_vehicle_arrival(self, vehicle: Vehicle) -> None:
-        loc_id = vehicle.current_location.id
-        
-        if loc_id in self.trigger_customers:
-            # Event auslösen
-            self.dynamic_events_count += 1
-            # Den Trigger entfernen
-            self.trigger_customers.remove(loc_id)
-            
-            new_id = f'CUSTOMER NEW {self.dynamic_events_count}'
-            
+    def __init__(self, num_dynamic_events: int, min_event_time: float = 0, max_event_time: float = 3000) -> None:
+        super().__init__()
+        self.num_dynamic_events = num_dynamic_events
+        self.min_event_time = min_event_time
+        self.max_event_time = max_event_time
+
+    def setup_events(self):
+        # Zufällige, auf [min_event_time, max_event_time] begrenzte Zeitpunkte ziehen
+        event_times = sorted(NEW_TIME_RNG.uniform(self.min_event_time, self.max_event_time, size=self.num_dynamic_events))
+
+        dynamic_orders = []
+        for i, release_time in enumerate(event_times):
             x_new = NEW_COORD_RNG.integers(-1000, 1001)
             y_new = NEW_COORD_RNG.integers(-1000, 1001)
-            
+
             # Location und Order erstellen
-            new_loc = Location(id=new_id, x=x_new, y=y_new)
+            new_loc = Location(id=f'CUSTOMER NEW {i+1}', x=x_new, y=y_new)
             self.add_location(new_loc)
-            
-            order_new = Order(id=f'O-NEW-{self.dynamic_events_count}')
+
+            order_new = Order(id=f'O-NEW-{i+1}')
             order_new.pickup_location = new_loc
             order_new.delivery_location = self._locations['DEPOT']
 
-            order_new.release_date = self.env.now
+            order_new.release_date = release_time
             order_new.pickup_duration = 0
             order_new.delivery_duration = 0
-            
-            self.request_order(order_new, decision_point_on_request=True)
 
-    def __init__(self, num_dynamic_events: int) -> None:
-        super().__init__()
-        self.num_dynamic_events = num_dynamic_events
-        self.trigger_customers = [] # Liste der IDs, die ein Event auslösen
-        self.dynamic_events_count = 0
+            dynamic_orders.append(order_new)
 
-    def setup_events(self):
-        # Alle vorhandenen Kunden IDs
-        all_customer_ids = [cid for cid in self._locations.keys() if cid != 'DEPOT']
-        
-        # Wählen zufällig n Kunden aus, die ein Event auslösen sollen
-        if len(all_customer_ids) >= self.num_dynamic_events:
-            self.trigger_customers = NEW_CUSTOMER_RNG.choice(
-                all_customer_ids, 
-                size=self.num_dynamic_events, 
-                replace=False
-            ).tolist()
+        self.env.process(order_provider(self, dynamic_orders, decision_point_on_request=True))
 
     def routing_callback(self):
         """
