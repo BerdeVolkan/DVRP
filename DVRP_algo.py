@@ -155,7 +155,7 @@ def solve_vrp_with_ortools(locations: dict, distance_location: dict, state: dict
     routing.AddDimensionWithVehicleTransits(
         transit_indices,
         0,  # kein Slack
-        3000000,  # maximale Fahrzeugdistanz
+        300000000,  # maximale Fahrzeugdistanz
         False,  # Do not force start cumul to zero marker
         dimension_name,
     )
@@ -173,7 +173,7 @@ def solve_vrp_with_ortools(locations: dict, distance_location: dict, state: dict
         routing_enums_pb2.LocalSearchMetaheuristic.GUIDED_LOCAL_SEARCH
     )
 
-    search_parameters.time_limit.seconds = 2
+    search_parameters.time_limit.seconds = 10
     
     # Löse Problem
     start_time = time.perf_counter()

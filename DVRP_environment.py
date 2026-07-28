@@ -11,7 +11,7 @@ import DVRP_utils
 
 class DemoModel(Model):
 
-    def __init__(self, num_dynamic_events: int, min_event_time: float = 0, max_event_time: float = 3000) -> None:
+    def __init__(self, num_dynamic_events: int, min_event_time: float = 0, max_event_time: float = 0) -> None:
         super().__init__()
         self.num_dynamic_events = num_dynamic_events
         self.min_event_time = min_event_time
@@ -23,9 +23,8 @@ class DemoModel(Model):
 
         dynamic_orders = []
         for i, release_time in enumerate(event_times):
-            x_new = DVRP_utils.NEW_COORD_RNG.integers(-1000, 1001)
-            y_new = DVRP_utils.NEW_COORD_RNG.integers(-1000, 1001)
-
+            x_new = DVRP_utils.NEW_COORD_RNG.integers(-5000, 5001)
+            y_new = DVRP_utils.NEW_COORD_RNG.integers(-5000, 5001)
             # Location und Order erstellen
             new_loc = Location(id=f'CUSTOMER NEW {i+1}', x=x_new, y=y_new)
             self.add_location(new_loc)
@@ -70,7 +69,7 @@ if __name__ == '__main__':
 
         print(f"Replikation {replication_index+1}/{NUM_REPLICATIONS} (seed={seed})")
 
-        num_new_customers = 3
+        num_new_customers = 4
         num_static_customers = 20
 
         model = DemoModel(num_dynamic_events=num_new_customers)
@@ -82,9 +81,8 @@ if __name__ == '__main__':
 
         # Erstelle Kunden mit zufälligen Koordinaten
         for i in range(num_static_customers):
-            x = DVRP_utils.ENV_RNG.integers(-1000, 1001)
-            y = DVRP_utils.ENV_RNG.integers(-1000, 1001)
-
+            x = DVRP_utils.ENV_RNG.integers(-5000, 5001)
+            y = DVRP_utils.ENV_RNG.integers(-5000, 5001)
             customer_location = Location(id=f'CUSTOMER {i+1}', x=x, y=y)
             model.add_location(customer_location)
 
