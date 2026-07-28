@@ -166,7 +166,7 @@ def solve_vrp_with_ortools(locations: dict, distance_location: dict, state: dict
     # Suchparameter
     search_parameters = pywrapcp.DefaultRoutingSearchParameters()
     search_parameters.first_solution_strategy = (
-        routing_enums_pb2.FirstSolutionStrategy.SAVINGS
+        routing_enums_pb2.FirstSolutionStrategy.PARALLEL_CHEAPEST_INSERTION
     )
 
     search_parameters.local_search_metaheuristic = (

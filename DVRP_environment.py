@@ -70,8 +70,8 @@ if __name__ == '__main__':
 
         print(f"Replikation {replication_index+1}/{NUM_REPLICATIONS} (seed={seed})")
 
-        num_new_customers = 4
-        num_static_customers = 100
+        num_new_customers = 3
+        num_static_customers = 20
 
         model = DemoModel(num_dynamic_events=num_new_customers)
 
