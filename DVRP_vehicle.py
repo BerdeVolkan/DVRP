@@ -1,6 +1,6 @@
 from dvrpsim import Location, Vehicle
 from dvrpsim.utils.distances import euclidean_distance
-from DVRP_utils import VEHICLE_RNG
+import DVRP_utils
 #from scipy.stats import rv_discrete, norm
 
 class Truck(Vehicle):
@@ -12,7 +12,7 @@ class Truck(Vehicle):
         base_distance = euclidean_distance(origin.x, origin.y, destination.x, destination.y)
         mu = 1.03
         sigma = 0.14
-        factor = VEHICLE_RNG.normal(mu, sigma)
+        factor = DVRP_utils.VEHICLE_RNG.normal(mu, sigma)
 
         # Clipping gegen unrealistische Ausreißer
         factor = max(0.5, factor)
