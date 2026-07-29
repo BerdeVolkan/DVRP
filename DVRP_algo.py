@@ -155,7 +155,7 @@ def solve_vrp_with_ortools(locations: dict, distance_location: dict, state: dict
     routing.AddDimensionWithVehicleTransits(
         transit_indices,
         0,  # kein Slack
-        300000000,  # maximale Fahrzeugdistanz
+        300000000000,  # maximale Fahrzeugdistanz
         False,  # Do not force start cumul to zero marker
         dimension_name,
     )
@@ -166,14 +166,14 @@ def solve_vrp_with_ortools(locations: dict, distance_location: dict, state: dict
     # Suchparameter
     search_parameters = pywrapcp.DefaultRoutingSearchParameters()
     search_parameters.first_solution_strategy = (
-        routing_enums_pb2.FirstSolutionStrategy.PARALLEL_CHEAPEST_INSERTION
+        routing_enums_pb2.FirstSolutionStrategy.SAVINGS
     )
 
     search_parameters.local_search_metaheuristic = (
-        routing_enums_pb2.LocalSearchMetaheuristic.GUIDED_LOCAL_SEARCH
+        routing_enums_pb2.LocalSearchMetaheuristic.TABU_SEARCH
     )
 
-    search_parameters.time_limit.seconds = 10
+    search_parameters.time_limit.seconds = 8
     
     # Löse Problem
     start_time = time.perf_counter()
