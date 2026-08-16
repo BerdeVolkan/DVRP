@@ -170,7 +170,7 @@ def solve_vrp_with_ortools(locations: dict, distance_location: dict, state: dict
     )
 
     #search_parameters.local_search_metaheuristic = (
-    #    routing_enums_pb2.LocalSearchMetaheuristic.TABU_SEARCH
+    #    routing_enums_pb2.LocalSearchMetaheuristic.GUIDED_LOCAL_SEARCH
     #)
 
     search_parameters.time_limit.seconds = 8
@@ -191,7 +191,6 @@ def solve_vrp_with_ortools(locations: dict, distance_location: dict, state: dict
         for route in routes_indices:
             route_ids = [data["location_ids"][idx] for idx in route]
             routes_ids.append(route_ids)
-        print(routes_ids)
         return routes_ids
     else:
         print("Keine Lösung gefunden!")
@@ -217,7 +216,7 @@ def convert_ortools_solution_to_dvrp(routes: list[list[str]], state: dict,
         order_id for order_id in state['open_orders'].keys()
     ]
     
-    # Sammle alle Fahrzeuge am Depot
+    # Sammle alle Fahrzeuge
     all_vehicles = [
         vehicle_id for vehicle_id in state['vehicles'].keys()
     ]
@@ -233,31 +232,43 @@ def convert_ortools_solution_to_dvrp(routes: list[list[str]], state: dict,
     assigned_orders = set()
     
     for vehicle_idx, route in enumerate(routes):
-        skip_outer = False
-
         if vehicle_idx >= len(all_vehicles):
             break
-        
+
         vehicle_id = all_vehicles[vehicle_idx]
-        
+
         # Überspringe wenn Route nur Depot enthält
         if not route or len(route) <= 2 and all(loc == 'DEPOT' for loc in route):
             continue
-        
+
         vehicle_route = []
         orders_in_route = []
 
-        if state['vehicles'][vehicle_id]['loaded_orders']:
-            orders_in_route.extend(state['vehicles'][vehicle_id]['loaded_orders'])
-        
+        # En-route zum Depot mit bereits geladenen Aufträgen: der erste Halt
+        # (next_visits[0]) ist fest zugesagt und darf nicht verändert werden,
+        # daher wird er 1:1 als eigener Delivery-Stop übernommen; die
+        # geladenen Aufträge werden NICHT nochmal am Routenende ausgeliefert.
+        en_route_to_depot_with_load = bool(
+            state['vehicles'][vehicle_id]['next_visits']
+            and state['vehicles'][vehicle_id]['loaded_orders']
+            and state['vehicles'][vehicle_id]['next_visits'][0]['location'] == 'DEPOT'
+            and route[0] == 'DEPOT'
+        )
+
+        if en_route_to_depot_with_load:
+            vehicle_route.append({
+                'location': 'DEPOT',
+                'delivery_list': list(state['vehicles'][vehicle_id]['loaded_orders'])
+            })
+            route_to_process = route[1:]
+        else:
+            if state['vehicles'][vehicle_id]['loaded_orders']:
+                orders_in_route.extend(state['vehicles'][vehicle_id]['loaded_orders'])
+            route_to_process = route
+
         # Verarbeite Route
-        for idx, loc_id in enumerate(route):
-            
-            if state['vehicles'][vehicle_id]['next_visits']:
-                if loc_id == 'DEPOT' and  state['vehicles'][vehicle_id]['loaded_orders'] and state['vehicles'][vehicle_id]['next_visits'][0]['location'] == 'DEPOT' and idx == 0:
-                    skip_outer = True
-                    break
-                    
+        for loc_id in route_to_process:
+
             if state['vehicles'][vehicle_id]['current_visit'] is not None:
                 if loc_id == state['vehicles'][vehicle_id]['current_visit']['location']:
                     if loc_id in order_location_map:
@@ -270,15 +281,12 @@ def convert_ortools_solution_to_dvrp(routes: list[list[str]], state: dict,
                 order_id = order_location_map[loc_id]
                 orders_in_route.append(order_id)
                 assigned_orders.add(order_id)
-                
+
                 # Pickup
                 vehicle_route.append({
                     'location': loc_id,
                     'pickup_list': [order_id]
                 })
-        
-        if skip_outer:
-            continue
 
         # Delivery am Depot dabei aber auf schon vorhandene Lieferungen prüfen
         if orders_in_route:
@@ -287,6 +295,7 @@ def convert_ortools_solution_to_dvrp(routes: list[list[str]], state: dict,
                 'delivery_list': orders_in_route
             })
 
+        if vehicle_route:
             vehicles_dict[vehicle_id] = {
                 'next_visits': vehicle_route
             }
