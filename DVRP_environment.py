@@ -11,7 +11,7 @@ import DVRP_utils
 
 class DemoModel(Model):
 
-    def __init__(self, num_dynamic_events: int, min_event_time: float = 0, max_event_time: float = 10000) -> None:
+    def __init__(self, num_dynamic_events: int, min_event_time: float = 0, max_event_time: float = 6000) -> None:
         super().__init__()
         self.num_dynamic_events = num_dynamic_events
         self.min_event_time = min_event_time
@@ -53,10 +53,10 @@ class DemoModel(Model):
 
 if __name__ == '__main__':
 
-    NUM_REPLICATIONS = 20
-    BASE_SEED = 0
+    NUM_REPLICATIONS = 1
+    BASE_SEED = 1
 
-    results_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'SAVINGS_TABU_SEARCH_dynamic_100.jsonl')
+    #results_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'SAVINGS_TABU_SEARCH_dynamic_100.jsonl')
 
     for replication_index in range(NUM_REPLICATIONS):
         seed = BASE_SEED + replication_index
@@ -70,7 +70,7 @@ if __name__ == '__main__':
         print(f"Replikation {replication_index+1}/{NUM_REPLICATIONS} (seed={seed})")
 
         num_new_customers = 4
-        num_static_customers = 100
+        num_static_customers = 20
 
         model = DemoModel(num_dynamic_events=num_new_customers)
 
@@ -139,8 +139,8 @@ if __name__ == '__main__':
             'reassigning_rates': DVRP_algo.reassigning_rates,
         }
 
-        with open(results_path, 'a') as f:
-            f.write(json.dumps(result_record) + '\n')
+        #with open(results_path, 'a') as f:
+        #    f.write(json.dumps(result_record) + '\n')
 
     print("-" * 80)
     print(f"{NUM_REPLICATIONS} Replikationen abgeschlossen")

@@ -169,9 +169,9 @@ def solve_vrp_with_ortools(locations: dict, distance_location: dict, state: dict
         routing_enums_pb2.FirstSolutionStrategy.SAVINGS
     )
 
-    search_parameters.local_search_metaheuristic = (
-        routing_enums_pb2.LocalSearchMetaheuristic.TABU_SEARCH
-    )
+    #search_parameters.local_search_metaheuristic = (
+    #    routing_enums_pb2.LocalSearchMetaheuristic.TABU_SEARCH
+    #)
 
     search_parameters.time_limit.seconds = 8
     
@@ -191,6 +191,7 @@ def solve_vrp_with_ortools(locations: dict, distance_location: dict, state: dict
         for route in routes_indices:
             route_ids = [data["location_ids"][idx] for idx in route]
             routes_ids.append(route_ids)
+        print(routes_ids)
         return routes_ids
     else:
         print("Keine Lösung gefunden!")
