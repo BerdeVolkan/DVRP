@@ -20,186 +20,144 @@
        0.0 | 00:00:00 | order O-19 is requested (CUSTOMER 19 -> DEPOT)
        0.0 | 00:00:00 | order O-20 is requested (CUSTOMER 20 -> DEPOT)
        0.0 | 00:00:00 | <<< routing >>>
-       0.0 | 00:00:00 | TRUCK-1 | departed from DEPOT to CUSTOMER 9
-       0.0 | 00:00:00 | TRUCK-2 | departed from DEPOT to CUSTOMER 14
-     534.6 | 00:08:54 | order O-NEW-1 is requested (CUSTOMER NEW 1 -> DEPOT)
-     534.6 | 00:08:54 | <<< routing >>>
-     534.6 | 00:08:54 | TRUCK-3 | departed from DEPOT to CUSTOMER NEW 1
-     534.6 | 00:08:54 | TRUCK-4 | departed from DEPOT to CUSTOMER 20
-    1307.0 | 00:21:46 | TRUCK-3 | arrived at CUSTOMER NEW 1
-    1307.0 | 00:21:46 | TRUCK-3 | service is started
-    1307.0 | 00:21:46 | TRUCK-3 | order O-NEW-1 is picked up
-    1307.0 | 00:21:46 | TRUCK-3 | service is finished
-    1307.0 | 00:21:46 | TRUCK-3 | departed from CUSTOMER NEW 1 to CUSTOMER 7
-    1521.1 | 00:25:21 | TRUCK-1 | arrived at CUSTOMER 9
-    1521.1 | 00:25:21 | TRUCK-1 | service is started
-    1521.1 | 00:25:21 | TRUCK-1 | order O-9 is picked up
-    1521.1 | 00:25:21 | TRUCK-1 | service is finished
-    1521.1 | 00:25:21 | TRUCK-1 | departed from CUSTOMER 9 to CUSTOMER 2
-    2911.7 | 00:48:31 | TRUCK-4 | arrived at CUSTOMER 20
-    2911.7 | 00:48:31 | TRUCK-4 | service is started
-    2911.7 | 00:48:31 | TRUCK-4 | order O-20 is picked up
-    2911.7 | 00:48:31 | TRUCK-4 | service is finished
-    2911.7 | 00:48:31 | TRUCK-4 | departed from CUSTOMER 20 to DEPOT
-    2923.5 | 00:48:43 | TRUCK-2 | arrived at CUSTOMER 14
-    2923.5 | 00:48:43 | TRUCK-2 | service is started
-    2923.5 | 00:48:43 | TRUCK-2 | order O-14 is picked up
-    2923.5 | 00:48:43 | TRUCK-2 | service is finished
-    2923.5 | 00:48:43 | TRUCK-2 | departed from CUSTOMER 14 to DEPOT
-    3635.1 | 01:00:35 | order O-NEW-2 is requested (CUSTOMER NEW 2 -> DEPOT)
-    3635.1 | 01:00:35 | <<< routing >>>
-    4258.8 | 01:10:58 | order O-NEW-3 is requested (CUSTOMER NEW 3 -> DEPOT)
-    4258.8 | 01:10:58 | <<< routing >>>
-    4686.7 | 01:18:06 | order O-NEW-4 is requested (CUSTOMER NEW 4 -> DEPOT)
-    4686.7 | 01:18:06 | <<< routing >>>
-    5028.6 | 01:23:48 | TRUCK-3 | arrived at CUSTOMER 7
-    5028.6 | 01:23:48 | TRUCK-3 | service is started
-    5028.6 | 01:23:48 | TRUCK-3 | order O-7 is picked up
-    5028.6 | 01:23:48 | TRUCK-3 | service is finished
-    5028.6 | 01:23:48 | TRUCK-3 | departed from CUSTOMER 7 to CUSTOMER 16
-    5288.8 | 01:28:08 | TRUCK-4 | arrived at DEPOT
-    5288.8 | 01:28:08 | TRUCK-4 | service is requested
-    5288.8 | 01:28:08 | TRUCK-4 | service is started
-    5288.8 | 01:28:08 | TRUCK-4 | order O-20 is delivered
-    5288.8 | 01:28:08 | TRUCK-4 | service is finished
-    5288.8 | 01:28:08 | TRUCK-4 | departed from DEPOT to CUSTOMER 8
-    5682.0 | 01:34:42 | TRUCK-1 | arrived at CUSTOMER 2
-    5682.0 | 01:34:42 | TRUCK-1 | service is started
-    5682.0 | 01:34:42 | TRUCK-1 | order O-2 is picked up
-    5682.0 | 01:34:42 | TRUCK-1 | service is finished
-    5682.0 | 01:34:42 | TRUCK-1 | departed from CUSTOMER 2 to CUSTOMER 4
-    5847.0 | 01:37:27 | TRUCK-2 | arrived at DEPOT
-    5847.0 | 01:37:27 | TRUCK-2 | service is requested
-    5847.0 | 01:37:27 | TRUCK-2 | service is started
-    5847.0 | 01:37:27 | TRUCK-2 | order O-14 is delivered
-    5847.0 | 01:37:27 | TRUCK-2 | service is finished
-    5847.0 | 01:37:27 | TRUCK-2 | departed from DEPOT to CUSTOMER 13
-    6360.3 | 01:46:00 | TRUCK-1 | arrived at CUSTOMER 4
-    6360.3 | 01:46:00 | TRUCK-1 | service is started
-    6360.3 | 01:46:00 | TRUCK-1 | order O-4 is picked up
-    6360.3 | 01:46:00 | TRUCK-1 | service is finished
-    6360.3 | 01:46:00 | TRUCK-1 | departed from CUSTOMER 4 to CUSTOMER 11
-    7882.9 | 02:11:22 | TRUCK-4 | arrived at CUSTOMER 8
-    7882.9 | 02:11:22 | TRUCK-4 | service is started
-    7882.9 | 02:11:22 | TRUCK-4 | order O-8 is picked up
-    7882.9 | 02:11:22 | TRUCK-4 | service is finished
-    7882.9 | 02:11:22 | TRUCK-4 | departed from CUSTOMER 8 to CUSTOMER 15
-    8358.2 | 02:19:18 | TRUCK-1 | arrived at CUSTOMER 11
-    8358.2 | 02:19:18 | TRUCK-1 | service is started
-    8358.2 | 02:19:18 | TRUCK-1 | order O-11 is picked up
-    8358.2 | 02:19:18 | TRUCK-1 | service is finished
-    8358.2 | 02:19:18 | TRUCK-1 | departed from CUSTOMER 11 to CUSTOMER 12
-    9055.2 | 02:30:55 | TRUCK-3 | arrived at CUSTOMER 16
-    9055.2 | 02:30:55 | TRUCK-3 | service is started
-    9055.2 | 02:30:55 | TRUCK-3 | order O-16 is picked up
-    9055.2 | 02:30:55 | TRUCK-3 | service is finished
-    9055.2 | 02:30:55 | TRUCK-3 | departed from CUSTOMER 16 to CUSTOMER 1
-    9450.8 | 02:37:30 | TRUCK-2 | arrived at CUSTOMER 13
-    9450.8 | 02:37:30 | TRUCK-2 | service is started
-    9450.8 | 02:37:30 | TRUCK-2 | order O-13 is picked up
-    9450.8 | 02:37:30 | TRUCK-2 | service is finished
-    9450.8 | 02:37:30 | TRUCK-2 | departed from CUSTOMER 13 to CUSTOMER 19
-    9584.4 | 02:39:44 | TRUCK-4 | arrived at CUSTOMER 15
-    9584.4 | 02:39:44 | TRUCK-4 | service is started
-    9584.4 | 02:39:44 | TRUCK-4 | order O-15 is picked up
-    9584.4 | 02:39:44 | TRUCK-4 | service is finished
-    9584.4 | 02:39:44 | TRUCK-4 | departed from CUSTOMER 15 to CUSTOMER 3
-   10530.0 | 02:55:29 | TRUCK-1 | arrived at CUSTOMER 12
-   10530.0 | 02:55:29 | TRUCK-1 | service is started
-   10530.0 | 02:55:29 | TRUCK-1 | order O-12 is picked up
-   10530.0 | 02:55:29 | TRUCK-1 | service is finished
-   10530.0 | 02:55:29 | TRUCK-1 | departed from CUSTOMER 12 to CUSTOMER 6
-   10980.5 | 03:03:00 | TRUCK-2 | arrived at CUSTOMER 19
-   10980.5 | 03:03:00 | TRUCK-2 | service is started
-   10980.5 | 03:03:00 | TRUCK-2 | order O-19 is picked up
-   10980.5 | 03:03:00 | TRUCK-2 | service is finished
-   10980.5 | 03:03:00 | TRUCK-2 | departed from CUSTOMER 19 to CUSTOMER 17
-   11407.9 | 03:10:07 | TRUCK-4 | arrived at CUSTOMER 3
-   11407.9 | 03:10:07 | TRUCK-4 | service is started
-   11407.9 | 03:10:07 | TRUCK-4 | order O-3 is picked up
-   11407.9 | 03:10:07 | TRUCK-4 | service is finished
-   11407.9 | 03:10:07 | TRUCK-4 | departed from CUSTOMER 3 to CUSTOMER 10
-   11719.6 | 03:15:19 | TRUCK-1 | arrived at CUSTOMER 6
-   11719.6 | 03:15:19 | TRUCK-1 | service is started
-   11719.6 | 03:15:19 | TRUCK-1 | order O-6 is picked up
-   11719.6 | 03:15:19 | TRUCK-1 | service is finished
-   11719.6 | 03:15:19 | TRUCK-1 | departed from CUSTOMER 6 to CUSTOMER NEW 2
-   11988.5 | 03:19:48 | TRUCK-2 | arrived at CUSTOMER 17
-   11988.5 | 03:19:48 | TRUCK-2 | service is started
-   11988.5 | 03:19:48 | TRUCK-2 | order O-17 is picked up
-   11988.5 | 03:19:48 | TRUCK-2 | service is finished
-   11988.5 | 03:19:48 | TRUCK-2 | departed from CUSTOMER 17 to CUSTOMER NEW 3
-   12178.6 | 03:22:58 | TRUCK-1 | arrived at CUSTOMER NEW 2
-   12178.6 | 03:22:58 | TRUCK-1 | service is started
-   12178.6 | 03:22:58 | TRUCK-1 | order O-NEW-2 is picked up
-   12178.6 | 03:22:58 | TRUCK-1 | service is finished
-   12178.6 | 03:22:58 | TRUCK-1 | departed from CUSTOMER NEW 2 to DEPOT
-   12591.6 | 03:29:51 | TRUCK-3 | arrived at CUSTOMER 1
-   12591.6 | 03:29:51 | TRUCK-3 | service is started
-   12591.6 | 03:29:51 | TRUCK-3 | order O-1 is picked up
-   12591.6 | 03:29:51 | TRUCK-3 | service is finished
-   12591.6 | 03:29:51 | TRUCK-3 | departed from CUSTOMER 1 to DEPOT
-   12680.2 | 03:31:20 | TRUCK-4 | arrived at CUSTOMER 10
-   12680.2 | 03:31:20 | TRUCK-4 | service is started
-   12680.2 | 03:31:20 | TRUCK-4 | order O-10 is picked up
-   12680.2 | 03:31:20 | TRUCK-4 | service is finished
-   12680.2 | 03:31:20 | TRUCK-4 | departed from CUSTOMER 10 to CUSTOMER 5
-   12884.5 | 03:34:44 | TRUCK-3 | arrived at DEPOT
-   12884.5 | 03:34:44 | TRUCK-3 | service is requested
-   12884.5 | 03:34:44 | TRUCK-3 | service is started
-   12884.5 | 03:34:44 | TRUCK-3 | order O-NEW-1 is delivered
-   12884.5 | 03:34:44 | TRUCK-3 | order O-7 is delivered
-   12884.5 | 03:34:44 | TRUCK-3 | order O-16 is delivered
-   12884.5 | 03:34:44 | TRUCK-3 | order O-1 is delivered
-   12884.5 | 03:34:44 | TRUCK-3 | service is finished
-   14127.2 | 03:55:27 | TRUCK-2 | arrived at CUSTOMER NEW 3
-   14127.2 | 03:55:27 | TRUCK-2 | service is started
-   14127.2 | 03:55:27 | TRUCK-2 | order O-NEW-3 is picked up
-   14127.2 | 03:55:27 | TRUCK-2 | service is finished
-   14127.2 | 03:55:27 | TRUCK-2 | departed from CUSTOMER NEW 3 to CUSTOMER NEW 4
-   15489.9 | 04:18:09 | TRUCK-1 | arrived at DEPOT
-   15489.9 | 04:18:09 | TRUCK-1 | service is requested
-   15489.9 | 04:18:09 | TRUCK-1 | service is started
-   15489.9 | 04:18:09 | TRUCK-1 | order O-9 is delivered
-   15489.9 | 04:18:09 | TRUCK-1 | order O-2 is delivered
-   15489.9 | 04:18:09 | TRUCK-1 | order O-4 is delivered
-   15489.9 | 04:18:09 | TRUCK-1 | order O-11 is delivered
-   15489.9 | 04:18:09 | TRUCK-1 | order O-12 is delivered
-   15489.9 | 04:18:09 | TRUCK-1 | order O-6 is delivered
-   15489.9 | 04:18:09 | TRUCK-1 | order O-NEW-2 is delivered
-   15489.9 | 04:18:09 | TRUCK-1 | service is finished
-   15959.8 | 04:25:59 | TRUCK-4 | arrived at CUSTOMER 5
-   15959.8 | 04:25:59 | TRUCK-4 | service is started
-   15959.8 | 04:25:59 | TRUCK-4 | order O-5 is picked up
-   15959.8 | 04:25:59 | TRUCK-4 | service is finished
-   15959.8 | 04:25:59 | TRUCK-4 | departed from CUSTOMER 5 to CUSTOMER 18
-   17582.1 | 04:53:02 | TRUCK-4 | arrived at CUSTOMER 18
-   17582.1 | 04:53:02 | TRUCK-4 | service is started
-   17582.1 | 04:53:02 | TRUCK-4 | order O-18 is picked up
-   17582.1 | 04:53:02 | TRUCK-4 | service is finished
-   17582.1 | 04:53:02 | TRUCK-4 | departed from CUSTOMER 18 to DEPOT
-   17608.0 | 04:53:28 | TRUCK-2 | arrived at CUSTOMER NEW 4
-   17608.0 | 04:53:28 | TRUCK-2 | service is started
-   17608.0 | 04:53:28 | TRUCK-2 | order O-NEW-4 is picked up
-   17608.0 | 04:53:28 | TRUCK-2 | service is finished
-   17608.0 | 04:53:28 | TRUCK-2 | departed from CUSTOMER NEW 4 to DEPOT
-   19099.0 | 05:18:18 | TRUCK-4 | arrived at DEPOT
-   19099.0 | 05:18:18 | TRUCK-4 | service is requested
-   19099.0 | 05:18:18 | TRUCK-4 | service is started
-   19099.0 | 05:18:18 | TRUCK-4 | order O-8 is delivered
-   19099.0 | 05:18:18 | TRUCK-4 | order O-15 is delivered
-   19099.0 | 05:18:18 | TRUCK-4 | order O-3 is delivered
-   19099.0 | 05:18:18 | TRUCK-4 | order O-10 is delivered
-   19099.0 | 05:18:18 | TRUCK-4 | order O-5 is delivered
-   19099.0 | 05:18:18 | TRUCK-4 | order O-18 is delivered
-   19099.0 | 05:18:18 | TRUCK-4 | service is finished
-   19154.5 | 05:19:14 | TRUCK-2 | arrived at DEPOT
-   19154.5 | 05:19:14 | TRUCK-2 | service is requested
-   19154.5 | 05:19:14 | TRUCK-2 | service is started
-   19154.5 | 05:19:14 | TRUCK-2 | order O-13 is delivered
-   19154.5 | 05:19:14 | TRUCK-2 | order O-19 is delivered
-   19154.5 | 05:19:14 | TRUCK-2 | order O-17 is delivered
-   19154.5 | 05:19:14 | TRUCK-2 | order O-NEW-3 is delivered
-   19154.5 | 05:19:14 | TRUCK-2 | order O-NEW-4 is delivered
-   19154.5 | 05:19:14 | TRUCK-2 | service is finished
-   19154.5 | 05:19:14 | FINISH
+       0.0 | 00:00:00 | TRUCK-1 | departed from DEPOT to CUSTOMER 8
+       0.0 | 00:00:00 | TRUCK-2 | departed from DEPOT to CUSTOMER 9
+       0.0 | 00:00:00 | TRUCK-3 | departed from DEPOT to CUSTOMER 20
+       0.0 | 00:00:00 | TRUCK-4 | departed from DEPOT to CUSTOMER 14
+    1521.1 | 00:25:21 | TRUCK-2 | arrived at CUSTOMER 9
+    1521.1 | 00:25:21 | TRUCK-2 | service is started
+    1521.1 | 00:25:21 | TRUCK-2 | order O-9 is picked up
+    1521.1 | 00:25:21 | TRUCK-2 | service is finished
+    1521.1 | 00:25:21 | TRUCK-2 | departed from CUSTOMER 9 to CUSTOMER 12
+    2377.1 | 00:39:37 | TRUCK-3 | arrived at CUSTOMER 20
+    2377.1 | 00:39:37 | TRUCK-3 | service is started
+    2377.1 | 00:39:37 | TRUCK-3 | order O-20 is picked up
+    2377.1 | 00:39:37 | TRUCK-3 | service is finished
+    2377.1 | 00:39:37 | TRUCK-3 | departed from CUSTOMER 20 to CUSTOMER 10
+    2594.1 | 00:43:14 | TRUCK-1 | arrived at CUSTOMER 8
+    2594.1 | 00:43:14 | TRUCK-1 | service is started
+    2594.1 | 00:43:14 | TRUCK-1 | order O-8 is picked up
+    2594.1 | 00:43:14 | TRUCK-1 | service is finished
+    2594.1 | 00:43:14 | TRUCK-1 | departed from CUSTOMER 8 to CUSTOMER 15
+    2923.5 | 00:48:43 | TRUCK-4 | arrived at CUSTOMER 14
+    2923.5 | 00:48:43 | TRUCK-4 | service is started
+    2923.5 | 00:48:43 | TRUCK-4 | order O-14 is picked up
+    2923.5 | 00:48:43 | TRUCK-4 | service is finished
+    2923.5 | 00:48:43 | TRUCK-4 | departed from CUSTOMER 14 to CUSTOMER 2
+    3465.5 | 00:57:45 | TRUCK-2 | arrived at CUSTOMER 12
+    3465.5 | 00:57:45 | TRUCK-2 | service is started
+    3465.5 | 00:57:45 | TRUCK-2 | order O-12 is picked up
+    3465.5 | 00:57:45 | TRUCK-2 | service is finished
+    3465.5 | 00:57:45 | TRUCK-2 | departed from CUSTOMER 12 to CUSTOMER 6
+    4295.6 | 01:11:35 | TRUCK-1 | arrived at CUSTOMER 15
+    4295.6 | 01:11:35 | TRUCK-1 | service is started
+    4295.6 | 01:11:35 | TRUCK-1 | order O-15 is picked up
+    4295.6 | 01:11:35 | TRUCK-1 | service is finished
+    4295.6 | 01:11:35 | TRUCK-1 | departed from CUSTOMER 15 to CUSTOMER 16
+    4655.2 | 01:17:35 | TRUCK-2 | arrived at CUSTOMER 6
+    4655.2 | 01:17:35 | TRUCK-2 | service is started
+    4655.2 | 01:17:35 | TRUCK-2 | order O-6 is picked up
+    4655.2 | 01:17:35 | TRUCK-2 | service is finished
+    4655.2 | 01:17:35 | TRUCK-2 | departed from CUSTOMER 6 to CUSTOMER 17
+    5798.6 | 01:36:38 | TRUCK-1 | arrived at CUSTOMER 16
+    5798.6 | 01:36:38 | TRUCK-1 | service is started
+    5798.6 | 01:36:38 | TRUCK-1 | order O-16 is picked up
+    5798.6 | 01:36:38 | TRUCK-1 | service is finished
+    5798.6 | 01:36:38 | TRUCK-1 | departed from CUSTOMER 16 to CUSTOMER 7
+    6355.0 | 01:45:54 | TRUCK-4 | arrived at CUSTOMER 2
+    6355.0 | 01:45:54 | TRUCK-4 | service is started
+    6355.0 | 01:45:54 | TRUCK-4 | order O-2 is picked up
+    6355.0 | 01:45:54 | TRUCK-4 | service is finished
+    6355.0 | 01:45:54 | TRUCK-4 | departed from CUSTOMER 2 to CUSTOMER 4
+    7033.2 | 01:57:13 | TRUCK-4 | arrived at CUSTOMER 4
+    7033.2 | 01:57:13 | TRUCK-4 | service is started
+    7033.2 | 01:57:13 | TRUCK-4 | order O-4 is picked up
+    7033.2 | 01:57:13 | TRUCK-4 | service is finished
+    7033.2 | 01:57:13 | TRUCK-4 | departed from CUSTOMER 4 to CUSTOMER 11
+    7159.2 | 01:59:19 | TRUCK-3 | arrived at CUSTOMER 10
+    7159.2 | 01:59:19 | TRUCK-3 | service is started
+    7159.2 | 01:59:19 | TRUCK-3 | order O-10 is picked up
+    7159.2 | 01:59:19 | TRUCK-3 | service is finished
+    7159.2 | 01:59:19 | TRUCK-3 | departed from CUSTOMER 10 to CUSTOMER 3
+    7742.9 | 02:09:02 | TRUCK-2 | arrived at CUSTOMER 17
+    7742.9 | 02:09:02 | TRUCK-2 | service is started
+    7742.9 | 02:09:02 | TRUCK-2 | order O-17 is picked up
+    7742.9 | 02:09:02 | TRUCK-2 | service is finished
+    7742.9 | 02:09:02 | TRUCK-2 | departed from CUSTOMER 17 to CUSTOMER 19
+    8431.5 | 02:20:31 | TRUCK-3 | arrived at CUSTOMER 3
+    8431.5 | 02:20:31 | TRUCK-3 | service is started
+    8431.5 | 02:20:31 | TRUCK-3 | order O-3 is picked up
+    8431.5 | 02:20:31 | TRUCK-3 | service is finished
+    8431.5 | 02:20:31 | TRUCK-3 | departed from CUSTOMER 3 to CUSTOMER 5
+    8750.8 | 02:25:50 | TRUCK-2 | arrived at CUSTOMER 19
+    8750.8 | 02:25:50 | TRUCK-2 | service is started
+    8750.8 | 02:25:50 | TRUCK-2 | order O-19 is picked up
+    8750.8 | 02:25:50 | TRUCK-2 | service is finished
+    8750.8 | 02:25:50 | TRUCK-2 | departed from CUSTOMER 19 to CUSTOMER 13
+    9031.2 | 02:30:31 | TRUCK-4 | arrived at CUSTOMER 11
+    9031.2 | 02:30:31 | TRUCK-4 | service is started
+    9031.2 | 02:30:31 | TRUCK-4 | order O-11 is picked up
+    9031.2 | 02:30:31 | TRUCK-4 | service is finished
+    9031.2 | 02:30:31 | TRUCK-4 | departed from CUSTOMER 11 to DEPOT
+    9825.3 | 02:43:45 | TRUCK-1 | arrived at CUSTOMER 7
+    9825.3 | 02:43:45 | TRUCK-1 | service is started
+    9825.3 | 02:43:45 | TRUCK-1 | order O-7 is picked up
+    9825.3 | 02:43:45 | TRUCK-1 | service is finished
+    9825.3 | 02:43:45 | TRUCK-1 | departed from CUSTOMER 7 to CUSTOMER 1
+   10280.5 | 02:51:20 | TRUCK-2 | arrived at CUSTOMER 13
+   10280.5 | 02:51:20 | TRUCK-2 | service is started
+   10280.5 | 02:51:20 | TRUCK-2 | order O-13 is picked up
+   10280.5 | 02:51:20 | TRUCK-2 | service is finished
+   10280.5 | 02:51:20 | TRUCK-2 | departed from CUSTOMER 13 to DEPOT
+   11153.4 | 03:05:53 | TRUCK-3 | arrived at CUSTOMER 5
+   11153.4 | 03:05:53 | TRUCK-3 | service is started
+   11153.4 | 03:05:53 | TRUCK-3 | order O-5 is picked up
+   11153.4 | 03:05:53 | TRUCK-3 | service is finished
+   11153.4 | 03:05:53 | TRUCK-3 | departed from CUSTOMER 5 to CUSTOMER 18
+   12775.7 | 03:32:55 | TRUCK-3 | arrived at CUSTOMER 18
+   12775.7 | 03:32:55 | TRUCK-3 | service is started
+   12775.7 | 03:32:55 | TRUCK-3 | order O-18 is picked up
+   12775.7 | 03:32:55 | TRUCK-3 | service is finished
+   12775.7 | 03:32:55 | TRUCK-3 | departed from CUSTOMER 18 to DEPOT
+   13480.1 | 03:44:40 | TRUCK-4 | arrived at DEPOT
+   13480.1 | 03:44:40 | TRUCK-4 | service is requested
+   13480.1 | 03:44:40 | TRUCK-4 | service is started
+   13480.1 | 03:44:40 | TRUCK-4 | order O-14 is delivered
+   13480.1 | 03:44:40 | TRUCK-4 | order O-2 is delivered
+   13480.1 | 03:44:40 | TRUCK-4 | order O-4 is delivered
+   13480.1 | 03:44:40 | TRUCK-4 | order O-11 is delivered
+   13480.1 | 03:44:40 | TRUCK-4 | service is finished
+   13564.7 | 03:46:04 | TRUCK-1 | arrived at CUSTOMER 1
+   13564.7 | 03:46:04 | TRUCK-1 | service is started
+   13564.7 | 03:46:04 | TRUCK-1 | order O-1 is picked up
+   13564.7 | 03:46:04 | TRUCK-1 | service is finished
+   13564.7 | 03:46:04 | TRUCK-1 | departed from CUSTOMER 1 to DEPOT
+   13857.5 | 03:50:57 | TRUCK-1 | arrived at DEPOT
+   13857.5 | 03:50:57 | TRUCK-1 | service is requested
+   13857.5 | 03:50:57 | TRUCK-1 | service is started
+   13857.5 | 03:50:57 | TRUCK-1 | order O-8 is delivered
+   13857.5 | 03:50:57 | TRUCK-1 | order O-15 is delivered
+   13857.5 | 03:50:57 | TRUCK-1 | order O-16 is delivered
+   13857.5 | 03:50:57 | TRUCK-1 | order O-7 is delivered
+   13857.5 | 03:50:57 | TRUCK-1 | order O-1 is delivered
+   13857.5 | 03:50:57 | TRUCK-1 | service is finished
+   13884.3 | 03:51:24 | TRUCK-2 | arrived at DEPOT
+   13884.3 | 03:51:24 | TRUCK-2 | service is requested
+   13884.3 | 03:51:24 | TRUCK-2 | service is started
+   13884.3 | 03:51:24 | TRUCK-2 | order O-9 is delivered
+   13884.3 | 03:51:24 | TRUCK-2 | order O-12 is delivered
+   13884.3 | 03:51:24 | TRUCK-2 | order O-6 is delivered
+   13884.3 | 03:51:24 | TRUCK-2 | order O-17 is delivered
+   13884.3 | 03:51:24 | TRUCK-2 | order O-19 is delivered
+   13884.3 | 03:51:24 | TRUCK-2 | order O-13 is delivered
+   13884.3 | 03:51:24 | TRUCK-2 | service is finished
+   14292.6 | 03:58:12 | TRUCK-3 | arrived at DEPOT
+   14292.6 | 03:58:12 | TRUCK-3 | service is requested
+   14292.6 | 03:58:12 | TRUCK-3 | service is started
+   14292.6 | 03:58:12 | TRUCK-3 | order O-20 is delivered
+   14292.6 | 03:58:12 | TRUCK-3 | order O-10 is delivered
+   14292.6 | 03:58:12 | TRUCK-3 | order O-3 is delivered
+   14292.6 | 03:58:12 | TRUCK-3 | order O-5 is delivered
+   14292.6 | 03:58:12 | TRUCK-3 | order O-18 is delivered
+   14292.6 | 03:58:12 | TRUCK-3 | service is finished
+   14292.6 | 03:58:12 | FINISH
