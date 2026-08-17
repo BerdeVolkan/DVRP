@@ -138,7 +138,7 @@ if __name__ == '__main__':
             'solve_times': DVRP_algo.solve_times,
             'reassigning_rates': DVRP_algo.reassigning_rates,
         }
-
+        print(sum(result_record['truck_delivery_times'].values()))
         #with open(results_path, 'a') as f:
         #    f.write(json.dumps(result_record) + '\n')
 
