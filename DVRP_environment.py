@@ -70,7 +70,7 @@ if __name__ == '__main__':
         print(f"Replikation {replication_index+1}/{NUM_REPLICATIONS} (seed={seed})")
 
         num_new_customers = 0
-        num_static_customers = 20
+        num_static_customers = 15
 
         model = DemoModel(num_dynamic_events=num_new_customers)
 
@@ -139,6 +139,7 @@ if __name__ == '__main__':
             'reassigning_rates': DVRP_algo.reassigning_rates,
         }
         print(sum(result_record['truck_delivery_times'].values()))
+        print(result_record['solve_times'])
         #with open(results_path, 'a') as f:
         #    f.write(json.dumps(result_record) + '\n')
 

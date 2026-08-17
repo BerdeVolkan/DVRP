@@ -338,16 +338,22 @@ if __name__ == "__main__":
     # (z.B. num_epochs=500, batch_size=64) -- dauert dann entsprechend laenger.
     torch.manual_seed(0)
     SPAN_COEFFICIENT = 10.0  # wie SetGlobalSpanCostCoefficient(10) in DVRP_algo.py
+    TRAIN_CUSTOMERS = 20     # Groesse, auf der die Policy lernt
+    TEST_CUSTOMERS = 15      # Groesse, auf der sie geprueft wird -- bewusst kleiner
     #besser num_epochs=500, batch_size=64, dauert dann entsprechend laenger
-    trained_policy = train(num_epochs=500, batch_size=64, num_customers=20,
+    trained_policy = train(num_epochs=500, batch_size=64, num_customers=TRAIN_CUSTOMERS,
                             num_vehicles=4, span_coefficient=SPAN_COEFFICIENT)
 
-    # Test auf exakt der Instanz aus DVRP_environment.py (seed=1)
-    test_env = MultiVehicleVRPEnvironment(num_customers=20, num_vehicles=4,
+    # Test auf den ersten TEST_CUSTOMERS Kunden der Instanz aus DVRP_environment.py
+    # (seed=1) -- die Ziehreihenfolge ist pro Kunde x-dann-y, ein kleineres
+    # num_customers liefert also genau den vorderen Teilausschnitt der Instanz.
+    test_env = MultiVehicleVRPEnvironment(num_customers=TEST_CUSTOMERS, num_vehicles=4,
                                            span_coefficient=SPAN_COEFFICIENT, seed=123,
-                                           fixed_coords=dvrp_instance_coords(seed=1))
+                                           fixed_coords=dvrp_instance_coords(
+                                               seed=1, num_customers=TEST_CUSTOMERS))
     routes, route_dists, total_distance = greedy_rollout(trained_policy, test_env)
 
+    print(f"\nTraining auf {TRAIN_CUSTOMERS} Kunden | Test auf {TEST_CUSTOMERS} Kunden")
     print("\nGefundene Routen je Fahrzeug (0 = Depot):")
     for v, route in enumerate(routes):
         print(f"  Fahrzeug {v}: {route}")
