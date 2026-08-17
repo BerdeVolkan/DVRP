@@ -24,20 +24,52 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 
+import DVRP_utils
+
+
+# Gleiche Geometrie wie die Simulation in DVRP_environment.py:
+# Depot im Ursprung, Kunden ganzzahlig in [-5000, 5000] auf beiden Achsen.
+COORD_LIMIT = 5000
+MAX_DIST = float(np.hypot(2 * COORD_LIMIT, 2 * COORD_LIMIT))  # ~14142.14, groesste moegliche Distanz
+
+
+def dvrp_instance_coords(seed=1, num_customers=20):
+    """Exakt die Kundenkoordinaten aus DVRP_environment.py (Depot (0,0) + ENV_RNG).
+
+    Die Ziehreihenfolge (pro Kunde erst x, dann y) muss identisch zur Schleife in
+    DVRP_environment.py sein, sonst weichen die Koordinaten ab.
+    """
+    DVRP_utils.set_all_seeds(seed)
+    coords = np.zeros((num_customers + 1, 2), dtype=np.float32)  # Index 0 = Depot bei (0,0)
+    for i in range(1, num_customers + 1):
+        coords[i, 0] = DVRP_utils.ENV_RNG.integers(-COORD_LIMIT, COORD_LIMIT + 1)
+        coords[i, 1] = DVRP_utils.ENV_RNG.integers(-COORD_LIMIT, COORD_LIMIT + 1)
+    return coords
+
 
 # ---------------------------------------------------------------------------
 # 1) Umgebung: K Fahrzeuge, feste Kapazitaet
 # ---------------------------------------------------------------------------
 class MultiVehicleVRPEnvironment:
-    def __init__(self, num_customers=15, num_vehicles=4, capacity=20, seed=None):
+    def __init__(self, num_customers=20, num_vehicles=4, capacity=20, seed=None,
+                 fixed_coords=None):
         self.num_customers = num_customers
         self.num_vehicles = num_vehicles
         self.capacity = capacity
         self.rng = np.random.default_rng(seed)
+        # fixed_coords: feste Instanz (z.B. die aus DVRP_environment.py) statt
+        # einer neuen Zufallsinstanz pro Episode
+        self.fixed_coords = fixed_coords
 
     def reset(self):
         n = self.num_customers + 1  # Index 0 = Depot
-        self.coords = self.rng.uniform(0, 1, size=(n, 2)).astype(np.float32)
+        if self.fixed_coords is not None:
+            self.coords = self.fixed_coords.copy()
+        else:
+            self.coords = self.rng.integers(
+                -COORD_LIMIT, COORD_LIMIT + 1, size=(n, 2)
+            ).astype(np.float32)
+            self.coords[0] = 0.0  # Depot im Ursprung, wie in DVRP_environment.py
 
         demand = self.rng.integers(1, 10, size=n).astype(np.float32)
         demand[0] = 0.0  # Depot hat keine Nachfrage
@@ -107,19 +139,22 @@ def build_features(state):
     vehicle_pos = state["vehicle_pos"]
     vehicle_cap_left = state["vehicle_cap_left"]
 
-    n = coords.shape[0]
-    K = len(vehicle_pos)
+    n = coords.shape[0]     #Anzahl der Knoten (Depot + Kunden)
+    K = len(vehicle_pos)    #Anzahl der Fahrzeuge
 
     is_depot = np.zeros(n, dtype=np.float32)
     is_depot[0] = 1.0
     demand_norm = demand / capacity
+    # Koordinaten und Distanzen liegen im Meter-Bereich (bis ~14000) und muessen
+    # normalisiert werden, sonst saettigt das Netz sofort
+    coords_norm = coords / COORD_LIMIT  # [-1, 1]
 
     rows = []
     for v in range(K):
-        dist_to_vehicle = np.linalg.norm(coords - coords[vehicle_pos[v]], axis=1)
+        dist_to_vehicle = np.linalg.norm(coords - coords[vehicle_pos[v]], axis=1) / MAX_DIST  # [0, 1]
         cap_col = np.full(n, vehicle_cap_left[v] / capacity, dtype=np.float32)
         feats = np.stack(
-            [coords[:, 0], coords[:, 1], demand_norm, dist_to_vehicle, cap_col, is_depot],
+            [coords_norm[:, 0], coords_norm[:, 1], demand_norm, dist_to_vehicle, cap_col, is_depot],
             axis=1,
         )
         rows.append(feats)
@@ -150,8 +185,8 @@ class SimplePolicy(nn.Module):
 # ---------------------------------------------------------------------------
 # 3) REINFORCE-Trainingsschleife
 # ---------------------------------------------------------------------------
-def train(num_epochs=150, batch_size=16, num_customers=15, num_vehicles=4,
-          capacity=20, lr=1e-3, max_steps=150, log_every=25):
+def train(num_epochs=150, batch_size=16, num_customers=20, num_vehicles=4,
+          capacity=20, lr=1e-3, max_steps=200, log_every=25):
     env = MultiVehicleVRPEnvironment(num_customers=num_customers, num_vehicles=num_vehicles,
                                       capacity=capacity)
     policy = SimplePolicy(num_features=6)
@@ -189,7 +224,9 @@ def train(num_epochs=150, batch_size=16, num_customers=15, num_vehicles=4,
 
         rewards = torch.tensor(batch_rewards, dtype=torch.float32)
         baseline = rewards.mean()                # einfache Batch-Mittelwert-Baseline
-        advantage = rewards - baseline
+        # Standardisieren, damit die Gradienten unabhaengig von der Meter-Skala
+        # der Distanzen (~1e5 pro Episode) bleiben
+        advantage = (rewards - baseline) / (rewards.std() + 1e-8)
 
         loss = -(torch.stack(batch_log_probs) * advantage.detach()).mean()
 
@@ -199,7 +236,7 @@ def train(num_epochs=150, batch_size=16, num_customers=15, num_vehicles=4,
 
         if epoch % log_every == 0 or epoch == num_epochs - 1:
             avg_distance = -rewards.mean().item()
-            print(f"Epoch {epoch:4d} | durchschn. Gesamtdistanz: {avg_distance:6.3f} "
+            print(f"Epoch {epoch:4d} | durchschn. Gesamtdistanz: {avg_distance:10.1f} m "
                   f"| loss: {loss.item():7.4f}")
 
     return policy
@@ -208,7 +245,7 @@ def train(num_epochs=150, batch_size=16, num_customers=15, num_vehicles=4,
 # ---------------------------------------------------------------------------
 # 4) Trainierte Policy greedy auf einer neuen Instanz anwenden
 # ---------------------------------------------------------------------------
-def greedy_rollout(policy, env, max_steps=150):
+def greedy_rollout(policy, env, max_steps=200):
     state = env.reset()
     n = env.num_customers + 1
     for _ in range(max_steps):
@@ -230,14 +267,17 @@ if __name__ == "__main__":
     # (z.B. num_epochs=500, batch_size=64) -- dauert dann entsprechend laenger.
     torch.manual_seed(0)
     #besser num_epochs=500, batch_size=64, dauert dann entsprechend laenger
-    trained_policy = train(num_epochs=150, batch_size=16, num_customers=15,
+    trained_policy = train(num_epochs=150, batch_size=16, num_customers=20,
                             num_vehicles=4, capacity=20)
 
-    test_env = MultiVehicleVRPEnvironment(num_customers=15, num_vehicles=4,
-                                           capacity=20, seed=123)
+    # Test auf exakt der Instanz aus DVRP_environment.py (seed=1)
+    test_env = MultiVehicleVRPEnvironment(num_customers=20, num_vehicles=4,
+                                           capacity=20, seed=123,
+                                           fixed_coords=dvrp_instance_coords(seed=1))
     routes, cap_left, total_distance = greedy_rollout(trained_policy, test_env)
 
     print("\nGefundene Routen je Fahrzeug (0 = Depot):")
     for v, route in enumerate(routes):
         print(f"  Fahrzeug {v}: {route}")
-    print(f"Gesamtdistanz ueber alle Fahrzeuge: {total_distance:.3f}")
+    print(f"Alle Kunden beliefert und zurueck im Depot: {test_env.is_done()}")
+    print(f"Gesamtdistanz ueber alle Fahrzeuge: {total_distance:.1f} m")
