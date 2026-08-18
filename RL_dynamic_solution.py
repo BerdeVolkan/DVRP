@@ -483,7 +483,7 @@ def greedy_rollout(policy, env, max_steps=200, initial_state=None):
 if __name__ == "__main__":
     torch.manual_seed(0)
     SPAN_COEFFICIENT = 10.0  # wie SetGlobalSpanCostCoefficient(10) in DVRP_algo.py
-    TRAIN_CUSTOMERS = 150     # bleibt bei 20: dvrpsim triggert das Routing im
+    TRAIN_CUSTOMERS = 250     # bleibt bei 20: dvrpsim triggert das Routing im
     NUM_VEHICLES = 4         # Wesentlichen beim Eintreffen neuer Kunden
 
     # Training auf zufaelligen Entscheidungspunkt-Zustaenden (Fahrzeuge unterwegs,
