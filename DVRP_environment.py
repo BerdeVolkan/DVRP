@@ -13,12 +13,12 @@ import DVRP_utils
 # Routing-Backend umschalten: DVRP_algo (OR-Tools) oder DVRP_rl_algo (trainierte
 # RL-Policy aus rl_policy.pt). Beide bieten routing_algorithm(state, locations)
 # sowie die Listen solve_times und reassigning_rates.
-ROUTING_BACKEND = DVRP_algo
+ROUTING_BACKEND = DVRP_rl_algo
 
 
 class DemoModel(Model):
 
-    def __init__(self, num_dynamic_events: int, min_event_time: float = 0, max_event_time: float = 15000) -> None:
+    def __init__(self, num_dynamic_events: int, min_event_time: float = 0, max_event_time: float = 20000) -> None:
         super().__init__()
         self.num_dynamic_events = num_dynamic_events
         self.min_event_time = min_event_time
