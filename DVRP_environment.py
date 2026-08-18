@@ -6,8 +6,15 @@ from dvrpsim.utils.distances import euclidean_distance
 from dvrpsim.utils.order_providers import order_provider
 from simpy import Resource
 import DVRP_algo
+import DVRP_rl_algo
 import DVRP_vehicle
 import DVRP_utils
+
+# Routing-Backend umschalten: DVRP_algo (OR-Tools) oder DVRP_rl_algo (trainierte
+# RL-Policy aus rl_policy.pt). Beide bieten routing_algorithm(state, locations)
+# sowie die Listen solve_times und reassigning_rates.
+ROUTING_BACKEND = DVRP_rl_algo
+
 
 class DemoModel(Model):
 
@@ -44,11 +51,11 @@ class DemoModel(Model):
     def routing_callback(self):
         """
         Wird bei jedem Routing-Request aufgerufen
-        Nutzt OR-Tools für die Optimierung
+        Nutzt das oben gewählte ROUTING_BACKEND für die Optimierung
         """
         state = self.get_state()
         #print(self._locations) # dict mit Key Location zb Depot und Value Location object
-        return DVRP_algo.routing_algorithm(state, self._locations)
+        return ROUTING_BACKEND.routing_algorithm(state, self._locations)
 
 
 if __name__ == '__main__':
@@ -62,10 +69,10 @@ if __name__ == '__main__':
         seed = BASE_SEED + replication_index
         DVRP_utils.set_all_seeds(seed)
 
-        # Modul-Level-Listen in DVRP_algo würden sich sonst über mehrere
+        # Modul-Level-Listen im gewählten Backend würden sich sonst über mehrere
         # Durchläufe aufsummieren statt pro Lauf isoliert zu sein
-        DVRP_algo.solve_times.clear()
-        DVRP_algo.reassigning_rates.clear()
+        ROUTING_BACKEND.solve_times.clear()
+        ROUTING_BACKEND.reassigning_rates.clear()
 
         print(f"Replikation {replication_index+1}/{NUM_REPLICATIONS} (seed={seed})")
 
@@ -135,8 +142,8 @@ if __name__ == '__main__':
             'jain_fairness_index': jain_fairness_index,
             'total_makespan': max(truck_max_delivery.values()),
             'truck_delivery_times': truck_max_delivery,
-            'solve_times': DVRP_algo.solve_times,
-            'reassigning_rates': DVRP_algo.reassigning_rates,
+            'solve_times': ROUTING_BACKEND.solve_times,
+            'reassigning_rates': ROUTING_BACKEND.reassigning_rates,
         }
         print(sum(result_record['truck_delivery_times'].values()))
         print(result_record['solve_times'])

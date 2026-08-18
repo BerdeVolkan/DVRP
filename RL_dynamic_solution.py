@@ -1,7 +1,25 @@
 """
 REINFORCE fuer ein unkapazitiertes Multi-Vehicle-VRP mit Global-Span-Kosten
-(hier: 4 Fahrzeuge) -- also exakt das Problem, das auch die Simulation in
-DVRP_environment.py und der OR-Tools-Baseline-Solver in DVRP_algo.py loesen.
+(hier: 4 Fahrzeuge) -- trainiert auf **dynamischen Entscheidungspunkten**, wie sie
+in der Simulation tatsaechlich auftreten.
+
+Unterschied zu RL_static_solution.py: dort starten alle Fahrzeuge im Depot mit
+Restdistanz 0. dvrpsim ruft routing_callback aber mitten im Lauf auf -- Fahrzeuge
+sind unterwegs, haben einen fest zugesagten naechsten Halt und eine Restdistanz
+dorthin. Genau solche Zustaende erzeugt _reset_dynamic() im Training, und
+DVRP_rl_algo.solve_vrp_with_rl setzt beim Deployment ueber dieselbe Methode
+(reset_from) den echten Zustand aus dvrpsim ein.
+
+Die Features bleiben unveraendert: der Fahrzeugstandort steckt bereits in
+dist_to_vehicle (Feature 4), die Restdistanz in vehicle_route_dist (Feature 5)
+und in der Span-Marge (Feature 6). Neu ist nur, womit diese Groessen zu
+Episodenbeginn initialisiert werden.
+
+Trainiert wird die Policy einmalig ueber __main__ und als rl_policy.pt
+exportiert; das Deployment laedt sie und rechnet nur noch vorwaerts.
+
+Es ist exakt das Problem, das auch die Simulation in DVRP_environment.py und der
+OR-Tools-Baseline-Solver in DVRP_algo.py loesen.
 
 Keine Kapazitaet: die Simulation kennt keine Kapazitaetsdimension, Trucks
 sammeln Auftraege bei den Kunden ein und liefern sie im Depot ab. Ohne
@@ -37,6 +55,8 @@ endloses "im Depot bleiben" (Distanz 0) den Reward zu hacken, statt echte
 Routen zu fahren.
 """
 
+import os
+
 import numpy as np
 import torch
 import torch.nn as nn
@@ -56,6 +76,10 @@ NUM_FEATURES = 7
 # Nur als Absicherung: Episoden koennen bei max_steps abgeschnitten werden, ohne
 # dass alle Kunden bedient sind -- ein unbedienter Kunde darf sich nie lohnen.
 UNSERVED_PENALTY = MAX_DIST
+
+HIDDEN_DIM = 64
+# Trainierte Policy fuer das Deployment in DVRP_rl_algo.py
+MODEL_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "rl_policy.pt")
 
 
 def dvrp_instance_coords(seed=1, num_customers=20):
@@ -77,7 +101,8 @@ def dvrp_instance_coords(seed=1, num_customers=20):
 # ---------------------------------------------------------------------------
 class MultiVehicleVRPEnvironment:
     def __init__(self, num_customers=20, num_vehicles=4, span_coefficient=10.0,
-                 seed=None, fixed_coords=None):
+                 seed=None, fixed_coords=None, dynamic_start=True,
+                 p_at_depot=0.25, p_to_depot=0.2):
         self.num_customers = num_customers
         self.num_vehicles = num_vehicles
         # Pendant zu distance_dimension.SetGlobalSpanCostCoefficient(10) in
@@ -88,8 +113,13 @@ class MultiVehicleVRPEnvironment:
         # fixed_coords: feste Instanz (z.B. die aus DVRP_environment.py) statt
         # einer neuen Zufallsinstanz pro Episode
         self.fixed_coords = fixed_coords
+        # dynamic_start=False -> statischer Fall wie in RL_static_solution.py
+        self.dynamic_start = dynamic_start
+        self.p_at_depot = p_at_depot    # Anteil Fahrzeuge, die im Depot stehen
+        self.p_to_depot = p_to_depot    # Anteil der Fahrenden, die zum Depot unterwegs sind
 
-    def reset(self):
+    def _init_instance(self):
+        """Koordinaten und offene Kunden setzen -- gemeinsam fuer alle reset-Varianten."""
         n = self.num_customers + 1  # Index 0 = Depot
         if self.fixed_coords is not None:
             self.coords = self.fixed_coords.copy()
@@ -102,14 +132,85 @@ class MultiVehicleVRPEnvironment:
         self.unvisited = np.ones(n, dtype=bool)
         self.unvisited[0] = False  # Depot ist kein zu bedienender Kunde
 
+    def _apply_start_state(self, start_nodes, remaining_dists):
+        """Fahrzeugzustand aus Startknoten und Restdistanzen aufbauen."""
         K = self.num_vehicles
-        self.vehicle_pos = np.zeros(K, dtype=np.int64)          # alle starten im Depot
-        # Entspricht der Cumul-Variable der OR-Tools-Distance-Dimension
-        self.vehicle_route_dist = np.zeros(K, dtype=np.float32)
+        self.vehicle_pos = np.asarray(start_nodes, dtype=np.int64).copy()
+        # Entspricht der Cumul-Variable der OR-Tools-Distance-Dimension: sie startet
+        # bei 0 und bekommt die Restdistanz als Zuschlag auf die erste Kante.
+        self.vehicle_route_dist = np.asarray(remaining_dists, dtype=np.float32).copy()
         self.vehicle_done = np.zeros(K, dtype=bool)             # Tour beendet?
-        self.total_distance = 0.0
-        self.routes = [[0] for _ in range(K)]
+        # Die Restdistanzen sind bei OR-Tools Teil der Kantenkosten und zaehlen
+        # damit in die Gesamtdistanz -- hier genauso, sonst weichen die
+        # Zielfunktionen am selben Entscheidungspunkt voneinander ab.
+        self.total_distance = float(np.sum(self.vehicle_route_dist))
+        self.routes = [[int(j)] for j in self.vehicle_pos]
+
+        # Ein Kunden-Startknoten ist fest zugesagt: das Fahrzeug bedient ihn bei
+        # Ankunft, also ist er kein offener Kunde mehr.
+        for j in self.vehicle_pos:
+            if j != 0:
+                self.unvisited[j] = False
+
         return self._state()
+
+    def reset_from(self, start_nodes, remaining_dists):
+        """Setzt die Umgebung auf einen konkreten Entscheidungspunkt-Zustand.
+
+        start_nodes[v]      Knotenindex, den Fahrzeug v fest ansteuert (bzw. wo es
+                            steht) -- Pendant zu data["starts"] in DVRP_algo.py
+        remaining_dists[v]  noch zu fahrende Distanz bis dorthin -- Pendant zu
+                            extra_start_distance (Zuschlag auf die erste Kante)
+
+        Wird von DVRP_rl_algo beim Deployment benutzt und im Training ueber
+        _reset_dynamic mit zufaelligen Werten gefuellt -- beide Pfade teilen sich
+        damit garantiert dieselbe Zustandssemantik.
+        """
+        self._init_instance()
+        return self._apply_start_state(start_nodes, remaining_dists)
+
+    def _reset_dynamic(self):
+        """Zufaelliger Entscheidungspunkt-Zustand fuer das Training.
+
+        Die Restdistanz wird nicht frei gezogen, sondern aus der Geometrie
+        erzeugt: das Fahrzeug steht auf der Kante zwischen zwei Knoten, also ist
+        die Restdistanz der noch ungefahrene Anteil einer echten Kante. Damit ist
+        sie automatisch sinnvoll begrenzt (Mittel ~2600 m, praktisch nie ueber
+        10000 m) statt von einer willkuerlichen Obergrenze abzuhaengen.
+        """
+        self._init_instance()
+        n = self.num_customers + 1
+        K = self.num_vehicles
+
+        start_nodes = np.zeros(K, dtype=np.int64)
+        remaining = np.zeros(K, dtype=np.float32)
+
+        # Ziele ohne Zuruecklegen: zwei Trucks koennen nicht auf denselben offenen
+        # Auftrag zusteuern. Aufs Depot dagegen schon, das bleibt immer waehlbar.
+        free_customers = list(self.rng.permutation(np.arange(1, n)))
+
+        for v in range(K):
+            if self.rng.random() < self.p_at_depot or not free_customers:
+                continue  # steht im Depot, Restdistanz 0 -- deckt auch t=0 ab
+
+            if self.rng.random() < self.p_to_depot:
+                target = 0                       # en route zum Depot (z.B. mit Ladung)
+            else:
+                target = int(free_customers.pop())
+
+            origin = int(self.rng.integers(0, n))
+            edge = float(np.linalg.norm(self.coords[origin] - self.coords[target]))
+            remaining[v] = (1.0 - self.rng.random()) * edge  # ungefahrener Anteil
+            start_nodes[v] = target
+
+        return self._apply_start_state(start_nodes, remaining)
+
+    def reset(self):
+        if self.dynamic_start:
+            return self._reset_dynamic()
+        # Statischer Fall: alle im Depot, nichts vorgefahren
+        K = self.num_vehicles
+        return self.reset_from(np.zeros(K, dtype=np.int64), np.zeros(K, dtype=np.float32))
 
     def _state(self):
         return {
@@ -245,13 +346,57 @@ class SimplePolicy(nn.Module):
 
 
 # ---------------------------------------------------------------------------
+# 2b) Export/Import: Training und Deployment sind getrennte Laeufe
+# ---------------------------------------------------------------------------
+def save_policy(policy, path=MODEL_PATH, **extra):
+    """Speichert Gewichte samt allem, was zum Nachbau noetig ist.
+
+    Die Normierungskonstanten muessen mit: weichen sie beim Deployment ab,
+    rechnet das Netz still auf einer anderen Skala als im Training.
+    """
+    config = {
+        "num_features": NUM_FEATURES,
+        "hidden_dim": HIDDEN_DIM,
+        "coord_limit": COORD_LIMIT,
+        "max_dist": MAX_DIST,
+        "route_dist_norm": ROUTE_DIST_NORM,
+    }
+    config.update(extra)
+    torch.save({"model_state": policy.state_dict(), "config": config}, path)
+    print(f"Policy gespeichert: {path}")
+    return path
+
+
+def load_policy(path=MODEL_PATH):
+    """Laedt eine exportierte Policy. Returns (policy, config)."""
+    checkpoint = torch.load(path, map_location="cpu", weights_only=False)
+    config = checkpoint["config"]
+
+    for name, value in (("coord_limit", COORD_LIMIT), ("max_dist", MAX_DIST),
+                        ("route_dist_norm", ROUTE_DIST_NORM)):
+        if not np.isclose(config[name], value):
+            raise ValueError(
+                f"Normierung weicht ab: {name} war beim Training {config[name]}, "
+                f"ist hier {value}. Die Policy wuerde auf falscher Skala rechnen."
+            )
+
+    policy = SimplePolicy(num_features=config["num_features"],
+                          hidden_dim=config["hidden_dim"])
+    policy.load_state_dict(checkpoint["model_state"])
+    policy.eval()
+    return policy, config
+
+
+# ---------------------------------------------------------------------------
 # 3) REINFORCE-Trainingsschleife
 # ---------------------------------------------------------------------------
 def train(num_epochs=150, batch_size=16, num_customers=20, num_vehicles=4,
-          span_coefficient=10.0, lr=1e-3, max_steps=200, log_every=25):
+          span_coefficient=10.0, lr=1e-3, max_steps=200, log_every=25,
+          dynamic_start=True):
     env = MultiVehicleVRPEnvironment(num_customers=num_customers, num_vehicles=num_vehicles,
-                                      span_coefficient=span_coefficient)
-    policy = SimplePolicy(num_features=NUM_FEATURES)
+                                      span_coefficient=span_coefficient,
+                                      dynamic_start=dynamic_start)
+    policy = SimplePolicy(num_features=NUM_FEATURES, hidden_dim=HIDDEN_DIM)
     optimizer = optim.Adam(policy.parameters(), lr=lr)
     n = num_customers + 1
 
@@ -316,8 +461,10 @@ def train(num_epochs=150, batch_size=16, num_customers=20, num_vehicles=4,
 # ---------------------------------------------------------------------------
 # 4) Trainierte Policy greedy auf einer neuen Instanz anwenden
 # ---------------------------------------------------------------------------
-def greedy_rollout(policy, env, max_steps=200):
-    state = env.reset()
+def greedy_rollout(policy, env, max_steps=200, initial_state=None):
+    """initial_state: Rueckgabe von env.reset_from(...), wenn der Startzustand
+    schon feststeht (Deployment) statt neu gezogen zu werden (Training)."""
+    state = env.reset() if initial_state is None else initial_state
     n = env.num_customers + 1
     for _ in range(max_steps):
         mask = env.feasibility_mask()
@@ -334,26 +481,33 @@ def greedy_rollout(policy, env, max_steps=200):
 
 
 if __name__ == "__main__":
-    # Hinweis: fuer bessere Ergebnisse num_epochs/batch_size erhoehen
-    # (z.B. num_epochs=500, batch_size=64) -- dauert dann entsprechend laenger.
     torch.manual_seed(0)
     SPAN_COEFFICIENT = 10.0  # wie SetGlobalSpanCostCoefficient(10) in DVRP_algo.py
-    TRAIN_CUSTOMERS = 20     # Groesse, auf der die Policy lernt
-    TEST_CUSTOMERS = 20      # Groesse, auf der sie geprueft wird -- bewusst kleiner
-    #besser num_epochs=500, batch_size=64, dauert dann entsprechend laenger
-    trained_policy = train(num_epochs=500, batch_size=64, num_customers=TRAIN_CUSTOMERS,
-                            num_vehicles=4, span_coefficient=SPAN_COEFFICIENT)
+    TRAIN_CUSTOMERS = 20     # bleibt bei 20: dvrpsim triggert das Routing im
+    NUM_VEHICLES = 4         # Wesentlichen beim Eintreffen neuer Kunden
 
-    # Test auf den ersten TEST_CUSTOMERS Kunden der Instanz aus DVRP_environment.py
-    # (seed=1) -- die Ziehreihenfolge ist pro Kunde x-dann-y, ein kleineres
-    # num_customers liefert also genau den vorderen Teilausschnitt der Instanz.
-    test_env = MultiVehicleVRPEnvironment(num_customers=TEST_CUSTOMERS, num_vehicles=4,
-                                           span_coefficient=SPAN_COEFFICIENT, seed=123,
+    # Training auf zufaelligen Entscheidungspunkt-Zustaenden (Fahrzeuge unterwegs,
+    # mit Restdistanz) -- nicht mehr nur auf dem t=0-Zustand.
+    trained_policy = train(num_epochs=500, batch_size=64, num_customers=TRAIN_CUSTOMERS,
+                            num_vehicles=NUM_VEHICLES, span_coefficient=SPAN_COEFFICIENT,
+                            dynamic_start=True)
+
+    save_policy(trained_policy, num_customers=TRAIN_CUSTOMERS,
+                num_vehicles=NUM_VEHICLES, span_coefficient=SPAN_COEFFICIENT,
+                dynamic_start=True)
+
+    # Kontrolllauf auf dem t=0-Zustand der Instanz aus DVRP_environment.py (seed=1):
+    # alle Fahrzeuge im Depot, Restdistanz 0 -- damit direkt mit den Zahlen aus
+    # RL_static_solution.py vergleichbar.
+    test_env = MultiVehicleVRPEnvironment(num_customers=TRAIN_CUSTOMERS,
+                                           num_vehicles=NUM_VEHICLES,
+                                           span_coefficient=SPAN_COEFFICIENT,
+                                           dynamic_start=False,
                                            fixed_coords=dvrp_instance_coords(
-                                               seed=1, num_customers=TEST_CUSTOMERS))
+                                               seed=1, num_customers=TRAIN_CUSTOMERS))
     routes, route_dists, total_distance = greedy_rollout(trained_policy, test_env)
 
-    print(f"\nTraining auf {TRAIN_CUSTOMERS} Kunden | Test auf {TEST_CUSTOMERS} Kunden")
+    print(f"\nDynamisch trainiert | Kontrolle auf dem t=0-Zustand ({TRAIN_CUSTOMERS} Kunden)")
     print("\nGefundene Routen je Fahrzeug (0 = Depot):")
     for v, route in enumerate(routes):
         print(f"  Fahrzeug {v}: {route}")
