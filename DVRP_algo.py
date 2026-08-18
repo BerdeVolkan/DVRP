@@ -170,10 +170,10 @@ def solve_vrp_with_ortools(locations: dict, distance_location: dict, state: dict
     )
 
     search_parameters.local_search_metaheuristic = (
-        routing_enums_pb2.LocalSearchMetaheuristic.GUIDED_LOCAL_SEARCH
+        routing_enums_pb2.LocalSearchMetaheuristic.TABU_SEARCH
     )
 
-    search_parameters.time_limit.seconds = 5
+    search_parameters.time_limit.seconds = 10
     
     # Löse Problem
     start_time = time.perf_counter()
