@@ -74,8 +74,9 @@ MAX_DIST = float(np.hypot(2 * COORD_LIMIT, 2 * COORD_LIMIT))  # ~14142.14, groes
 # Normierung fuer die Routenlaengen-Features (beobachtete Routen: ~14k-48k m)
 ROUTE_DIST_NORM = MAX_DIST
 NUM_FEATURES = 7
-# Nur als Absicherung: Episoden koennen bei max_steps abgeschnitten werden, ohne
-# dass alle Kunden bedient sind -- ein unbedienter Kunde darf sich nie lohnen.
+# Nur als Absicherung: seit max_steps aus der Instanzgroesse abgeleitet wird, kann
+# eine Episode nicht mehr regulaer abgeschnitten werden -- ein unbedienter Kunde
+# darf sich aber unter keinen Umstaenden lohnen.
 UNSERVED_PENALTY = MAX_DIST
 
 HIDDEN_DIM = 64
@@ -398,11 +399,21 @@ def load_policy(path=MODEL_PATH):
 # 3) REINFORCE-Trainingsschleife
 # ---------------------------------------------------------------------------
 def train(num_epochs=150, batch_size=16, num_customers=20, num_vehicles=4,
-          span_coefficient=10.0, lr=1e-3, max_steps=200, log_every=25,
-          dynamic_start=True):
+          span_coefficient=10.0, lr=1e-3, max_steps=None, log_every=25,
+          dynamic_start=True, seed=None):
+    # Exakte Obergrenze statt fester Konstante: eine Episode besteht aus hoechstens
+    # num_customers Kundenbesuchen plus je Fahrzeug einer Depot-Rueckfahrt. Ein
+    # fester Wert (frueher 200) schneidet Episoden ab ~200 Kunden ab -- die Policy
+    # optimiert dann gegen den Abschneide-Effekt statt gegen die Zielfunktion.
+    if max_steps is None:
+        max_steps = num_customers + num_vehicles
+    # Ein Seed steuert Netzinitialisierung und gezogene Trainingsinstanzen, damit
+    # eine Serie mit mehreren Seeds je Problemgroesse wiederholbar ist.
+    if seed is not None:
+        torch.manual_seed(seed)
     env = MultiVehicleVRPEnvironment(num_customers=num_customers, num_vehicles=num_vehicles,
                                       span_coefficient=span_coefficient,
-                                      dynamic_start=dynamic_start)
+                                      dynamic_start=dynamic_start, seed=seed)
     policy = SimplePolicy(num_features=NUM_FEATURES, hidden_dim=HIDDEN_DIM)
     optimizer = optim.Adam(policy.parameters(), lr=lr)
     n = num_customers + 1
@@ -468,9 +479,13 @@ def train(num_epochs=150, batch_size=16, num_customers=20, num_vehicles=4,
 # ---------------------------------------------------------------------------
 # 4) Trainierte Policy greedy auf einer neuen Instanz anwenden
 # ---------------------------------------------------------------------------
-def greedy_rollout(policy, env, max_steps=200, initial_state=None):
+def greedy_rollout(policy, env, max_steps=None, initial_state=None):
     """initial_state: Rueckgabe von env.reset_from(...), wenn der Startzustand
     schon feststeht (Deployment) statt neu gezogen zu werden (Training)."""
+    # Wie in train(): aus der Instanz abgeleitet, sonst bleiben bei grossen
+    # Instanzen Kunden ohne Route (bei 250 Kunden waren es mit dem alten Deckel 53).
+    if max_steps is None:
+        max_steps = env.num_customers + env.num_vehicles
     state = env.reset() if initial_state is None else initial_state
     n = env.num_customers + 1
     for _ in range(max_steps):
@@ -488,28 +503,32 @@ def greedy_rollout(policy, env, max_steps=200, initial_state=None):
 
 
 if __name__ == "__main__":
-    torch.manual_seed(0)
     SPAN_COEFFICIENT = 10.0  # wie SetGlobalSpanCostCoefficient(10) in DVRP_algo.py
     TRAIN_CUSTOMERS = 250    # Instanzgroesse, auf der trainiert wird
     NUM_VEHICLES = 4
-    # Zieldatei dieses Trainingslaufs -- vor jedem Lauf setzen, damit die Modelle
-    # der anderen Instanzgroessen erhalten bleiben.
-    OUTPUT_FILE = "rl_policy_250.pt"
+    # Seed des Trainingslaufs: steuert Netzinitialisierung und Trainingsinstanzen.
+    # Fuer die Varianz je Problemgroesse mehrere Laeufe mit 1..5 fahren.
+    TRAIN_SEED = 1
+    # Zieldatei dieses Laufs. Groesse und Seed stehen im Namen, damit sich die
+    # Modelle der Serie nicht gegenseitig ueberschreiben.
+    OUTPUT_FILE = f"rl_policy_{TRAIN_CUSTOMERS}_seed{TRAIN_SEED}.pt"
 
     # Training auf zufaelligen Entscheidungspunkt-Zustaenden (Fahrzeuge unterwegs,
     # mit Restdistanz) -- nicht mehr nur auf dem t=0-Zustand.
     trained_policy = train(num_epochs=500, batch_size=64, num_customers=TRAIN_CUSTOMERS,
                             num_vehicles=NUM_VEHICLES, span_coefficient=SPAN_COEFFICIENT,
-                            dynamic_start=True)
+                            dynamic_start=True, seed=TRAIN_SEED)
 
     save_policy(trained_policy, path=os.path.join(BASE_DIR, OUTPUT_FILE),
-                num_customers=TRAIN_CUSTOMERS,
+                num_customers=TRAIN_CUSTOMERS, seed=TRAIN_SEED,
                 num_vehicles=NUM_VEHICLES, span_coefficient=SPAN_COEFFICIENT,
                 dynamic_start=True)
 
     # Kontrolllauf auf dem t=0-Zustand der Instanz aus DVRP_environment.py (seed=1):
     # alle Fahrzeuge im Depot, Restdistanz 0 -- damit direkt mit den Zahlen aus
-    # RL_static_solution.py vergleichbar.
+    # RL_static_solution.py vergleichbar. Die Instanz bleibt bewusst bei seed=1,
+    # unabhaengig von TRAIN_SEED: sonst wuerde sich die Varianz zwischen den
+    # Trainingslaeufen mit Instanz-Varianz vermischen.
     test_env = MultiVehicleVRPEnvironment(num_customers=TRAIN_CUSTOMERS,
                                            num_vehicles=NUM_VEHICLES,
                                            span_coefficient=SPAN_COEFFICIENT,

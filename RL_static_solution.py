@@ -53,8 +53,9 @@ MAX_DIST = float(np.hypot(2 * COORD_LIMIT, 2 * COORD_LIMIT))  # ~14142.14, groes
 # Normierung fuer die Routenlaengen-Features (beobachtete Routen: ~14k-48k m)
 ROUTE_DIST_NORM = MAX_DIST
 NUM_FEATURES = 7
-# Nur als Absicherung: Episoden koennen bei max_steps abgeschnitten werden, ohne
-# dass alle Kunden bedient sind -- ein unbedienter Kunde darf sich nie lohnen.
+# Nur als Absicherung: seit max_steps aus der Instanzgroesse abgeleitet wird, kann
+# eine Episode nicht mehr regulaer abgeschnitten werden -- ein unbedienter Kunde
+# darf sich aber unter keinen Umstaenden lohnen.
 UNSERVED_PENALTY = MAX_DIST
 
 
@@ -248,7 +249,11 @@ class SimplePolicy(nn.Module):
 # 3) REINFORCE-Trainingsschleife
 # ---------------------------------------------------------------------------
 def train(num_epochs=150, batch_size=16, num_customers=20, num_vehicles=4,
-          span_coefficient=10.0, lr=1e-3, max_steps=200, log_every=25):
+          span_coefficient=10.0, lr=1e-3, max_steps=None, log_every=25):
+    # Exakte Obergrenze statt fester Konstante: hoechstens num_customers
+    # Kundenbesuche plus je Fahrzeug eine Depot-Rueckfahrt.
+    if max_steps is None:
+        max_steps = num_customers + num_vehicles
     env = MultiVehicleVRPEnvironment(num_customers=num_customers, num_vehicles=num_vehicles,
                                       span_coefficient=span_coefficient)
     policy = SimplePolicy(num_features=NUM_FEATURES)
@@ -316,7 +321,9 @@ def train(num_epochs=150, batch_size=16, num_customers=20, num_vehicles=4,
 # ---------------------------------------------------------------------------
 # 4) Trainierte Policy greedy auf einer neuen Instanz anwenden
 # ---------------------------------------------------------------------------
-def greedy_rollout(policy, env, max_steps=200):
+def greedy_rollout(policy, env, max_steps=None):
+    if max_steps is None:
+        max_steps = env.num_customers + env.num_vehicles
     state = env.reset()
     n = env.num_customers + 1
     for _ in range(max_steps):

@@ -51,11 +51,12 @@ def set_model_path(path: str) -> str:
     geladene Modell aktiv -- relevant, wenn mehrere Modelle nacheinander
     ausgewertet werden.
     """
-    global MODEL_FILE, MODEL_PATH, _policy, _policy_config
+    global MODEL_FILE, MODEL_PATH, _policy, _policy_config, _size_checked
     MODEL_PATH = path if os.path.isabs(path) else os.path.join(BASE_DIR, path)
     MODEL_FILE = os.path.basename(MODEL_PATH)
     _policy = None
     _policy_config = None
+    _size_checked = False   # neues Modell -> Groessenpruefung wieder scharf
     return MODEL_PATH
 
 
@@ -76,6 +77,33 @@ def get_policy():
             )
         print(f"RL-Policy geladen: {MODEL_PATH} ({_policy_config})")
     return _policy
+
+
+_size_checked = False
+
+
+def _check_instance_size(num_customers: int) -> None:
+    """Warnt, wenn das geladene Modell fuer eine ganz andere Groesse trainiert wurde.
+
+    load_policy prueft nur die Normierungskonstanten -- die haengen nicht von der
+    Kundenzahl ab, ein 20er-Modell wuerde auf einer 250er-Instanz also still
+    durchlaufen.
+
+    Geprueft wird ausschliesslich der erste Entscheidungspunkt: dort ist die
+    Instanz vollstaendig. Spaeter schrumpft sie mit jeder Auslieferung, eine
+    Abweichung waere dann normal und keine Warnung wert.
+    """
+    global _size_checked
+    if _size_checked:
+        return
+    _size_checked = True
+
+    trained = _policy_config.get('num_customers') if _policy_config else None
+    if not trained or not num_customers:
+        return
+    if not (1 / 1.5 <= num_customers / trained <= 1.5):
+        print(f"Warnung: Policy wurde auf {trained} Kunden trainiert, die Instanz hat "
+              f"hier {num_customers}. Passt MODEL_FILE zur Simulationsgroesse?")
 
 
 def build_rl_start_state(locations: dict, distance_location: dict, state: dict,
@@ -139,6 +167,7 @@ def solve_vrp_with_rl(locations: dict, distance_location: dict, state: dict,
     location_ids, coords, start_nodes, remaining_dists = build_rl_start_state(
         locations, distance_location, state, vehicle_ids
     )
+    _check_instance_size(len(location_ids) - 1)
 
     env = RL.MultiVehicleVRPEnvironment(
         num_customers=len(location_ids) - 1,
