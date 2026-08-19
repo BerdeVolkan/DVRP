@@ -56,6 +56,7 @@ Routen zu fahren.
 """
 
 import os
+from datetime import datetime
 
 import numpy as np
 import torch
@@ -78,8 +79,11 @@ NUM_FEATURES = 7
 UNSERVED_PENALTY = MAX_DIST
 
 HIDDEN_DIM = 64
-# Trainierte Policy fuer das Deployment in DVRP_rl_algo.py
-MODEL_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "rl_policy.pt")
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+# Nur der Default-Pfad von save_policy/load_policy. Der Trainingslauf setzt seine
+# Zieldatei unten ueber OUTPUT_FILE, das Deployment waehlt seine Datei
+# unabhaengig davon in DVRP_rl_algo.py (MODEL_FILE).
+MODEL_PATH = os.path.join(BASE_DIR, "rl_policy.pt")
 
 
 def dvrp_instance_coords(seed=1, num_customers=20):
@@ -362,6 +366,9 @@ def save_policy(policy, path=MODEL_PATH, **extra):
         "route_dist_norm": ROUTE_DIST_NORM,
     }
     config.update(extra)
+    if os.path.exists(path):
+        stand = datetime.fromtimestamp(os.path.getmtime(path)).strftime("%d.%m.%Y %H:%M")
+        print(f"Achtung: {os.path.basename(path)} (vom {stand}) wird ueberschrieben.")
     torch.save({"model_state": policy.state_dict(), "config": config}, path)
     print(f"Policy gespeichert: {path}")
     return path
@@ -483,8 +490,11 @@ def greedy_rollout(policy, env, max_steps=200, initial_state=None):
 if __name__ == "__main__":
     torch.manual_seed(0)
     SPAN_COEFFICIENT = 10.0  # wie SetGlobalSpanCostCoefficient(10) in DVRP_algo.py
-    TRAIN_CUSTOMERS = 250     # bleibt bei 20: dvrpsim triggert das Routing im
-    NUM_VEHICLES = 4         # Wesentlichen beim Eintreffen neuer Kunden
+    TRAIN_CUSTOMERS = 250    # Instanzgroesse, auf der trainiert wird
+    NUM_VEHICLES = 4
+    # Zieldatei dieses Trainingslaufs -- vor jedem Lauf setzen, damit die Modelle
+    # der anderen Instanzgroessen erhalten bleiben.
+    OUTPUT_FILE = "rl_policy_250.pt"
 
     # Training auf zufaelligen Entscheidungspunkt-Zustaenden (Fahrzeuge unterwegs,
     # mit Restdistanz) -- nicht mehr nur auf dem t=0-Zustand.
@@ -492,7 +502,8 @@ if __name__ == "__main__":
                             num_vehicles=NUM_VEHICLES, span_coefficient=SPAN_COEFFICIENT,
                             dynamic_start=True)
 
-    save_policy(trained_policy, num_customers=TRAIN_CUSTOMERS,
+    save_policy(trained_policy, path=os.path.join(BASE_DIR, OUTPUT_FILE),
+                num_customers=TRAIN_CUSTOMERS,
                 num_vehicles=NUM_VEHICLES, span_coefficient=SPAN_COEFFICIENT,
                 dynamic_start=True)
 

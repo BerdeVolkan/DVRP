@@ -11,8 +11,9 @@ import DVRP_vehicle
 import DVRP_utils
 
 # Routing-Backend umschalten: DVRP_algo (OR-Tools) oder DVRP_rl_algo (trainierte
-# RL-Policy aus rl_policy.pt). Beide bieten routing_algorithm(state, locations)
-# sowie die Listen solve_times und reassigning_rates.
+# RL-Policy; welche Modelldatei geladen wird, steht dort in MODEL_FILE). Beide
+# bieten routing_algorithm(state, locations) sowie die Listen solve_times und
+# reassigning_rates.
 ROUTING_BACKEND = DVRP_rl_algo
 
 

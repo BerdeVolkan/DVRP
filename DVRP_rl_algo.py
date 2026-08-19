@@ -8,8 +8,9 @@ einer Zeile zwischen OR-Tools und RL umschalten kann:
     convert_rl_solution_to_DVRP(...)             <- statt convert_ortools_solution_to_dvrp
 
 Die Policy wird nicht hier trainiert, sondern von RL_dynamic_solution.py als
-rl_policy.pt exportiert und hier beim ersten Aufruf geladen. Training und
-Deployment sind damit getrennte Laeufe.
+.pt-Datei exportiert. Welche dieser Dateien geladen wird, steht unten in
+MODEL_FILE -- Training und Deployment sind damit getrennte Laeufe, und mehrere
+trainierte Modelle koennen nebeneinander liegen bleiben.
 
 Der Zustandsuebergang dvrpsim -> RL benutzt exakt dieselbe Logik wie OR-Tools:
 Startknoten ist der fest zugesagte naechste Halt (bei EN_ROUTE) bzw. der aktuelle
@@ -17,6 +18,8 @@ Standort, und die Restdistanz dorthin entspricht dem Zuschlag, den OR-Tools auf
 die erste Kante des Fahrzeugs rechnet (extra_start_distance in DVRP_algo.py).
 """
 
+import glob
+import os
 import time
 from typing import Any
 
@@ -29,22 +32,49 @@ import RL_dynamic_solution as RL
 solve_times = []
 reassigning_rates = []
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# Welche exportierte Policy geladen wird. Bewusst hier statt aus
+# RL_dynamic_solution: Training und Auswertung sind getrennte Laeufe, und ein
+# neuer Trainingslauf soll nicht mitbestimmen, welches Modell ausgewertet wird.
+MODEL_FILE = "rl_policy.pt"
+MODEL_PATH = os.path.join(BASE_DIR, MODEL_FILE)
+
 _policy = None      # lazy geladen, damit der Import ohne Modelldatei nicht bricht
 _policy_config = None
 
 
+def set_model_path(path: str) -> str:
+    """Waehlt die zu ladende Policy-Datei (Dateiname oder vollstaendiger Pfad).
+
+    Verwirft die gecachte Policy, sonst bliebe im selben Prozess das zuerst
+    geladene Modell aktiv -- relevant, wenn mehrere Modelle nacheinander
+    ausgewertet werden.
+    """
+    global MODEL_FILE, MODEL_PATH, _policy, _policy_config
+    MODEL_PATH = path if os.path.isabs(path) else os.path.join(BASE_DIR, path)
+    MODEL_FILE = os.path.basename(MODEL_PATH)
+    _policy = None
+    _policy_config = None
+    return MODEL_PATH
+
+
 def get_policy():
-    """Laedt die exportierte Policy beim ersten Aufruf und cached sie."""
+    """Laedt die unter MODEL_PATH liegende Policy beim ersten Aufruf und cached sie."""
     global _policy, _policy_config
     if _policy is None:
         try:
-            _policy, _policy_config = RL.load_policy(RL.MODEL_PATH)
+            _policy, _policy_config = RL.load_policy(MODEL_PATH)
         except FileNotFoundError:
+            vorhanden = sorted(os.path.basename(p)
+                               for p in glob.glob(os.path.join(BASE_DIR, "*.pt")))
             raise FileNotFoundError(
-                f"Keine trainierte Policy unter {RL.MODEL_PATH}. "
-                f"Erst 'python RL_dynamic_solution.py' laufen lassen."
+                f"Keine trainierte Policy unter {MODEL_PATH}. "
+                f"Vorhandene Modelldateien: {vorhanden if vorhanden else 'keine'}. "
+                f"MODEL_FILE in DVRP_rl_algo.py anpassen oder erst "
+                f"'python RL_dynamic_solution.py' laufen lassen."
             )
-        print(f"RL-Policy geladen: {RL.MODEL_PATH} ({_policy_config})")
+        print(f"RL-Policy geladen: {MODEL_PATH} ({_policy_config})")
     return _policy
 
 
