@@ -14,12 +14,12 @@ import DVRP_utils
 # RL-Policy; welche Modelldatei geladen wird, steht dort in MODEL_FILE). Beide
 # bieten routing_algorithm(state, locations) sowie die Listen solve_times und
 # reassigning_rates.
-ROUTING_BACKEND = DVRP_rl_algo
+ROUTING_BACKEND = DVRP_algo
 
 
 class DemoModel(Model):
 
-    def __init__(self, num_dynamic_events: int, min_event_time: float = 0, max_event_time: float = 20000) -> None:
+    def __init__(self, num_dynamic_events: int, min_event_time: float = 0, max_event_time: float = 6000) -> None:
         super().__init__()
         self.num_dynamic_events = num_dynamic_events
         self.min_event_time = min_event_time
@@ -62,7 +62,7 @@ class DemoModel(Model):
 if __name__ == '__main__':
 
     NUM_REPLICATIONS = 1
-    BASE_SEED = 1
+    BASE_SEED = 5
 
     #results_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'SAVINGS_TABU_SEARCH_dynamic_100.jsonl')
 
@@ -79,7 +79,7 @@ if __name__ == '__main__':
         print(f"Replikation {replication_index+1}/{NUM_REPLICATIONS} (seed={seed})")
 
         num_new_customers = 4
-        num_static_customers = 250
+        num_static_customers = 20
 
         model = DemoModel(num_dynamic_events=num_new_customers)
 
@@ -151,6 +151,7 @@ if __name__ == '__main__':
         print(sum(result_record['truck_delivery_times'].values()))
         print(result_record['solve_times'])
         print(result_record['objective_values'])
+        print(result_record['seed'])
         #with open(results_path, 'a') as f:
         #    f.write(json.dumps(result_record) + '\n')
 

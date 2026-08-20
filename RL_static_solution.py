@@ -345,8 +345,8 @@ if __name__ == "__main__":
     # (z.B. num_epochs=500, batch_size=64) -- dauert dann entsprechend laenger.
     torch.manual_seed(0)
     SPAN_COEFFICIENT = 10.0  # wie SetGlobalSpanCostCoefficient(10) in DVRP_algo.py
-    TRAIN_CUSTOMERS = 20     # Groesse, auf der die Policy lernt
-    TEST_CUSTOMERS = 20      # Groesse, auf der sie geprueft wird -- bewusst kleiner
+    TRAIN_CUSTOMERS = 250     # Groesse, auf der die Policy lernt
+    TEST_CUSTOMERS = 250      # Groesse, auf der sie geprueft wird -- bewusst kleiner
     #besser num_epochs=500, batch_size=64, dauert dann entsprechend laenger
     trained_policy = train(num_epochs=500, batch_size=64, num_customers=TRAIN_CUSTOMERS,
                             num_vehicles=4, span_coefficient=SPAN_COEFFICIENT)
