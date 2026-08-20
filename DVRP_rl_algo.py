@@ -31,6 +31,7 @@ import RL_dynamic_solution as RL
 
 solve_times = []
 reassigning_rates = []
+objective_values = []
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -182,6 +183,9 @@ def solve_vrp_with_rl(locations: dict, distance_location: dict, state: dict,
     rl_state = env.reset_from(start_nodes, remaining_dists)
     routes_indices, _, _ = RL.greedy_rollout(policy, env, initial_state=rl_state)
     solve_times.append(time.perf_counter() - start_time)
+
+    # Gleiche Formel wie OR-Tools' ObjectiveValue: Distanz + span_coefficient * laengste Route
+    objective_values.append(env.total_cost())
 
     routes_ids = [[location_ids[idx] for idx in route] for route in routes_indices]
     return routes_ids

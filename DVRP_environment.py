@@ -74,6 +74,7 @@ if __name__ == '__main__':
         # Durchläufe aufsummieren statt pro Lauf isoliert zu sein
         ROUTING_BACKEND.solve_times.clear()
         ROUTING_BACKEND.reassigning_rates.clear()
+        ROUTING_BACKEND.objective_values.clear()
 
         print(f"Replikation {replication_index+1}/{NUM_REPLICATIONS} (seed={seed})")
 
@@ -145,9 +146,11 @@ if __name__ == '__main__':
             'truck_delivery_times': truck_max_delivery,
             'solve_times': ROUTING_BACKEND.solve_times,
             'reassigning_rates': ROUTING_BACKEND.reassigning_rates,
+            'objective_values': ROUTING_BACKEND.objective_values,
         }
         print(sum(result_record['truck_delivery_times'].values()))
         print(result_record['solve_times'])
+        print(result_record['objective_values'])
         #with open(results_path, 'a') as f:
         #    f.write(json.dumps(result_record) + '\n')
 

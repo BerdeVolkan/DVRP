@@ -8,6 +8,7 @@ import time
 
 solve_times = []
 reassigning_rates = []       # gesammelte Reassigning-Rate-Werte
+objective_values = []        # Zielfunktionswert je Entscheidungspunkt
 
 def travel_time_calc(origin: Location, destination: Location) -> float:
     return euclidean_distance(origin.x, origin.y, destination.x, destination.y)
@@ -183,6 +184,8 @@ def solve_vrp_with_ortools(locations: dict, distance_location: dict, state: dict
     #print(f"OR-Tools Lösung in {solve_duration:.4f} Sekunden gefunden")
     
     if solution:
+        objective_values.append(solution.ObjectiveValue())
+
         # Extrahiere Routen als Indizes
         routes_indices = extract_solution(data, manager, routing, solution)
         
