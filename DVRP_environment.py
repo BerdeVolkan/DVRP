@@ -19,7 +19,7 @@ ROUTING_BACKEND = DVRP_algo
 
 class DemoModel(Model):
 
-    def __init__(self, num_dynamic_events: int, min_event_time: float = 0, max_event_time: float = 6000) -> None:
+    def __init__(self, num_dynamic_events: int, min_event_time: float = 0, max_event_time: float = 25000) -> None:
         super().__init__()
         self.num_dynamic_events = num_dynamic_events
         self.min_event_time = min_event_time
@@ -62,7 +62,7 @@ class DemoModel(Model):
 if __name__ == '__main__':
 
     NUM_REPLICATIONS = 1
-    BASE_SEED = 5
+    BASE_SEED = 1
 
     #results_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'SAVINGS_TABU_SEARCH_dynamic_100.jsonl')
 
@@ -79,7 +79,7 @@ if __name__ == '__main__':
         print(f"Replikation {replication_index+1}/{NUM_REPLICATIONS} (seed={seed})")
 
         num_new_customers = 4
-        num_static_customers = 20
+        num_static_customers = 250
 
         model = DemoModel(num_dynamic_events=num_new_customers)
 
