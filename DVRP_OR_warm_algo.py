@@ -6,9 +6,14 @@ from typing import Any
 from pprint import pprint
 import time
 
-solve_times = []
-reassigning_rates = []       # gesammelte Reassigning-Rate-Werte
-objective_values = []        # Zielfunktionswert je Entscheidungspunkt
+import DVRP_rl_algo
+
+solve_times = []                  # RL-Rollout + OR-Tools = Entscheidungszeit gesamt
+rl_solve_times = []               # nur der greedy Rollout
+ortools_solve_times = []          # nur die OR-Tools-Suche
+reassigning_rates = []            # gesammelte Reassigning-Rate-Werte
+objective_values = []             # Zielfunktionswert je Entscheidungspunkt (nach GLS)
+warmstart_objective_values = []   # RL-Startloesung, von OR-Tools bewertet
 
 def travel_time_calc(origin: Location, destination: Location) -> float:
     return euclidean_distance(origin.x, origin.y, destination.x, destination.y)
@@ -62,6 +67,44 @@ def extract_solution(data: dict, manager, routing, solution) -> list[list[int]]:
     #print(routes)
     return routes
 
+
+def build_initial_routes(rl_routes: list[list[str]], data: dict, manager) -> list[list[int]] | None:
+    """Uebersetzt Warmstart-Routen (Location-IDs) in OR-Tools Routing-Indizes.
+
+    Umkehrung von extract_solution. Zwei Fallstricke, die hier abgefangen werden:
+      * ReadAssignmentFromRoutes erwartet Routing-Indizes, keine Knotennummern.
+        Die Abbildung ist nicht konstant -- steht ein Truck im Depot, gilt
+        NodeToIndex(n) == n, sonst faellt Knoten 0 aus dem Indexraum und alles
+        rutscht um eins. manager.NodeToIndex deckt beide Faelle ab.
+      * Start- und Endknoten duerfen nicht in den Routen stehen: route[0] ist der
+        Startknoten des Fahrzeugs, das DEPOT ist das Tourende (data["ends"]).
+
+    Gibt None zurueck, wenn die Startloesung nicht zum Modell passt -> Kaltstart.
+    """
+    location_index = {loc_id: idx for idx, loc_id in enumerate(data["location_ids"])}
+    initial_routes = []
+
+    for vehicle_idx, route in enumerate(rl_routes):
+        if not route:
+            return None
+        # route[0] ist der Startknoten des Fahrzeugs und damit Start(vehicle_idx);
+        # stimmt er nicht mit data["starts"] ueberein, sind Warmstart und OR-Tools
+        # nicht auf demselben Zustand -> lieber Kaltstart als eine falsche Startloesung.
+        if location_index.get(route[0]) != data["starts"][vehicle_idx]:
+            return None
+
+        indices = []
+        for loc_id in route[1:]:
+            if loc_id == 'DEPOT':      # Depot ist Tourende -> data["ends"]
+                continue
+            if loc_id not in location_index:
+                return None
+            indices.append(manager.NodeToIndex(location_index[loc_id]))
+        initial_routes.append(indices)
+
+    return initial_routes
+
+
 def print_distance(data, manager, routing, solution):
     """Print ditance for every vehicle on console."""
     print(f"Objective: {solution.ObjectiveValue()}\n")
@@ -87,10 +130,14 @@ def print_distance(data, manager, routing, solution):
         print(plan_output)
 
 
-def solve_vrp_with_ortools(locations: dict, distance_location: dict, state: dict, num_vehicles: int) -> list[list[str]]:
+def solve_vrp_with_ortools(locations: dict, distance_location: dict, state: dict, num_vehicles: int,
+                           initial_routes_ids: list[list[str]] | None = None) -> list[list[str]]:
     """
     Löst VRP mit OR-Tools und gibt Routen als Location-IDs zurück
-    
+
+    initial_routes_ids: Startlösung im selben Format wie der Rückgabewert (z.B. aus
+        der RL-Policy). Ohne sie läuft OR-Tools wie bisher kalt an.
+
     Returns:
         Liste von Routen, z.B. [['DEPOT', 'CUSTOMER 1', 'DEPOT'], ['DEPOT', 'CUSTOMER 2', 'DEPOT']]
     """
@@ -175,14 +222,37 @@ def solve_vrp_with_ortools(locations: dict, distance_location: dict, state: dict
     )
 
     search_parameters.time_limit.seconds = 60
-    
+
+    # Muss vor ReadAssignmentFromRoutes stehen, sonst wird das Modell implizit mit
+    # DEFAULT-Parametern geschlossen und die GLS-Einstellung wäre wirkungslos.
+    routing.CloseModelWithParameters(search_parameters)
+
+    initial_solution = None
+    if initial_routes_ids is not None:
+        initial_routes = build_initial_routes(initial_routes_ids, data, manager)
+        if initial_routes is not None:
+            initial_solution = routing.ReadAssignmentFromRoutes(initial_routes, True)
+        if initial_solution is None:
+            print("Warmstart nicht lesbar - OR-Tools startet kalt.")
+
     # Löse Problem
+    # Auch im Fallback angehängt (als None), damit warmstart_objective_values und
+    # objective_values in der Auswertung Index für Index zusammenpassen.
+    warmstart_objective_values.append(
+        initial_solution.ObjectiveValue() if initial_solution is not None else None
+    )
+
     start_time = time.perf_counter()
-    solution = routing.SolveWithParameters(search_parameters)
+    if initial_solution is not None:
+        # Mit Startlösung entfällt die Konstruktionsheuristik (SAVINGS): die lokale
+        # Suche mit GLS setzt direkt auf der übergebenen Lösung auf.
+        solution = routing.SolveFromAssignmentWithParameters(initial_solution, search_parameters)
+    else:
+        solution = routing.SolveWithParameters(search_parameters)
     solve_duration = time.perf_counter() - start_time
-    solve_times.append(solve_duration)
+    ortools_solve_times.append(solve_duration)
     #print(f"OR-Tools Lösung in {solve_duration:.4f} Sekunden gefunden")
-    
+
     if solution:
         objective_values.append(solution.ObjectiveValue())
 
@@ -373,8 +443,23 @@ def routing_algorithm(state: dict[str, Any], locations: dict) -> dict[str, Any]:
 
     # Löse mit OR-Tools
     num_vehicles = len(all_vehicles)
-    routes = solve_vrp_with_ortools(routing_locations, distance_location, state, num_vehicles)
-    
+
+    # Warmstart: erst die RL-Policy lösen lassen, dann von OR-Tools verbessern lassen.
+    # routing_locations und distance_location sind exakt die Dicts, die die Policy auch
+    # im reinen RL-Backend bekommt -- Startknoten, Restdistanzen und Knotenmenge sind
+    # damit für beide Solver identisch.
+    rl_routes = DVRP_rl_algo.solve_vrp_with_rl(
+        routing_locations, distance_location, state, num_vehicles
+    )
+    # Zeit aus DVRP_rl_algo statt selbst gestoppt: dort ist das einmalige Laden der
+    # Policy-Datei ausgeklammert, sonst wäre der erste Entscheidungspunkt verzerrt.
+    rl_solve_times.append(DVRP_rl_algo.solve_times[-1])
+
+    routes = solve_vrp_with_ortools(routing_locations, distance_location, state, num_vehicles,
+                                    initial_routes_ids=rl_routes)
+
+    solve_times.append(rl_solve_times[-1] + ortools_solve_times[-1])
+
     # Konvertiere zu DVRP Format
     result = convert_ortools_solution_to_dvrp(routes, state, locations)
 

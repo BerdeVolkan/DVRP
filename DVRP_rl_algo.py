@@ -38,7 +38,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 # Welche exportierte Policy geladen wird. Bewusst hier statt aus
 # RL_dynamic_solution: Training und Auswertung sind getrennte Laeufe, und ein
 # neuer Trainingslauf soll nicht mitbestimmen, welches Modell ausgewertet wird.
-MODEL_FILE = "rl_policy.pt"
+MODEL_FILE = "rl_policy_250_seed1.pt"
 MODEL_PATH = os.path.join(BASE_DIR, MODEL_FILE)
 
 _policy = None      # lazy geladen, damit der Import ohne Modelldatei nicht bricht
@@ -183,7 +183,7 @@ def solve_vrp_with_rl(locations: dict, distance_location: dict, state: dict,
     rl_state = env.reset_from(start_nodes, remaining_dists)
     routes_indices, _, _ = RL.greedy_rollout(policy, env, initial_state=rl_state)
     solve_times.append(time.perf_counter() - start_time)
-
+    #print(routes_indices)
     # Gleiche Formel wie OR-Tools' ObjectiveValue: Distanz + span_coefficient * laengste Route
     objective_values.append(env.total_cost())
 

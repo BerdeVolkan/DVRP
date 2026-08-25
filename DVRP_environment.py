@@ -7,14 +7,16 @@ from dvrpsim.utils.order_providers import order_provider
 from simpy import Resource
 import DVRP_algo
 import DVRP_rl_algo
+import DVRP_OR_warm_algo
 import DVRP_vehicle
 import DVRP_utils
 
-# Routing-Backend umschalten: DVRP_algo (OR-Tools) oder DVRP_rl_algo (trainierte
-# RL-Policy; welche Modelldatei geladen wird, steht dort in MODEL_FILE). Beide
-# bieten routing_algorithm(state, locations) sowie die Listen solve_times und
-# reassigning_rates.
-ROUTING_BACKEND = DVRP_algo
+# Routing-Backend umschalten: DVRP_algo (OR-Tools kalt), DVRP_rl_algo (trainierte
+# RL-Policy) oder DVRP_OR_warm_algo (RL-Policy als Startlösung, von OR-Tools
+# verbessert). Welche Modelldatei die Policy-Pfade laden, steht in MODEL_FILE in
+# DVRP_rl_algo. Alle drei bieten routing_algorithm(state, locations) sowie die
+# Listen solve_times, reassigning_rates und objective_values.
+ROUTING_BACKEND = DVRP_OR_warm_algo
 
 
 class DemoModel(Model):
@@ -71,10 +73,15 @@ if __name__ == '__main__':
         DVRP_utils.set_all_seeds(seed)
 
         # Modul-Level-Listen im gewählten Backend würden sich sonst über mehrere
-        # Durchläufe aufsummieren statt pro Lauf isoliert zu sein
-        ROUTING_BACKEND.solve_times.clear()
-        ROUTING_BACKEND.reassigning_rates.clear()
-        ROUTING_BACKEND.objective_values.clear()
+        # Durchläufe aufsummieren statt pro Lauf isoliert zu sein. Über getattr, weil
+        # nicht jedes Backend alle Metriken führt (nur DVRP_OR_warm_algo splittet die
+        # Zeit in RL-Anteil und OR-Tools-Anteil auf).
+        for metric_name in ('solve_times', 'reassigning_rates', 'objective_values',
+                            'rl_solve_times', 'ortools_solve_times',
+                            'warmstart_objective_values'):
+            metric = getattr(ROUTING_BACKEND, metric_name, None)
+            if metric is not None:
+                metric.clear()
 
         print(f"Replikation {replication_index+1}/{NUM_REPLICATIONS} (seed={seed})")
 
@@ -148,6 +155,14 @@ if __name__ == '__main__':
             'reassigning_rates': ROUTING_BACKEND.reassigning_rates,
             'objective_values': ROUTING_BACKEND.objective_values,
         }
+
+        # Nur beim Warmstart-Backend vorhanden: RL-/OR-Tools-Zeitanteil und der
+        # Zielfunktionswert der RL-Startlösung vor der OR-Tools-Verbesserung.
+        for metric_name in ('rl_solve_times', 'ortools_solve_times',
+                            'warmstart_objective_values'):
+            metric = getattr(ROUTING_BACKEND, metric_name, None)
+            if metric is not None:
+                result_record[metric_name] = metric
         print(sum(result_record['truck_delivery_times'].values()))
         print(result_record['solve_times'])
         print(result_record['objective_values'])

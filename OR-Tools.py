@@ -1,12 +1,4 @@
-"""Simple Vehicles Routing Problem (VRP).
-
-   This is a sample using the routing library python wrapper to solve a VRP
-   problem.
-   A description of the problem can be found here:
-   http://en.wikipedia.org/wiki/Vehicle_routing_problem.
-
-   Distances are in meters.
-"""
+"""Vehicles Routing Problem (VRP)."""
 
 from ortools.constraint_solver import routing_enums_pb2
 from ortools.constraint_solver import pywrapcp
@@ -36,8 +28,17 @@ def create_data_model():
       [662, 1210, 754, 1358, 1244, 708, 480, 856, 514, 468, 354, 844, 730, 536, 194, 798, 0],
         # fmt: on
     ]
+    data["initial_routes"] = [
+        # fmt: off
+      [16, 14, 13, 12, 11],
+      [4, 9, 10],
+      [1],
+      [5, 2, 6],
+        # fmt: on
+    ]
     data["num_vehicles"] = 4
-    data["depot"] = 0
+    data["starts"] = [8, 3, 15, 7]
+    data["ends"] = [0, 0, 0, 0]
     return data
 
 
@@ -65,13 +66,13 @@ def print_solution(data, manager, routing, solution):
 
 
 def main():
-    """Entry point of the program."""
+    """Solve the CVRP problem."""
     # Instantiate the data problem.
     data = create_data_model()
 
     # Create the routing index manager.
     manager = pywrapcp.RoutingIndexManager(
-        len(data["distance_matrix"]), data["num_vehicles"], data["depot"]
+        len(data["distance_matrix"]), data["num_vehicles"], data["starts"], data["ends"]
     )
 
     # Create Routing Model.
@@ -102,20 +103,44 @@ def main():
     distance_dimension = routing.GetDimensionOrDie(dimension_name)
     distance_dimension.SetGlobalSpanCostCoefficient(100)
 
-    # Setting first solution heuristic.
+    # Close model with the custom search parameters.
     search_parameters = pywrapcp.DefaultRoutingSearchParameters()
     search_parameters.first_solution_strategy = (
         routing_enums_pb2.FirstSolutionStrategy.PATH_CHEAPEST_ARC
     )
+    search_parameters.local_search_metaheuristic = (
+        routing_enums_pb2.LocalSearchMetaheuristic.GUIDED_LOCAL_SEARCH
+    )
+    search_parameters.time_limit.FromSeconds(5)
+    # When an initial solution is given for search, the model will be closed with
+    # the default search parameters unless it is explicitly closed with the custom
+    # search parameters.
+    routing.CloseModelWithParameters(search_parameters)
+
+    # Get initial solution from routes after closing the model.
+    # ReadAssignmentFromRoutes expects routing *indices*, not node numbers, and the
+    # two only coincide when every vehicle starts/ends at node 0. With custom starts
+    # the mapping shifts, so convert explicitly.
+    initial_routes = [
+        [manager.NodeToIndex(node) for node in route]
+        for route in data["initial_routes"]
+    ]
+    initial_solution = routing.ReadAssignmentFromRoutes(initial_routes, True)
+    if initial_solution is None:
+        print("Initial routes could not be read (infeasible or wrong indices).")
+        return
+    print("Initial solution:")
+    print_solution(data, manager, routing, initial_solution)
 
     # Solve the problem.
-    solution = routing.SolveWithParameters(search_parameters)
+    solution = routing.SolveFromAssignmentWithParameters(
+        initial_solution, search_parameters
+    )
 
     # Print solution on console.
     if solution:
+        print("Solution after search:")
         print_solution(data, manager, routing, solution)
-    else:
-        print("No solution found !")
 
 
 if __name__ == "__main__":
