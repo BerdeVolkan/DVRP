@@ -515,7 +515,7 @@ if __name__ == "__main__":
 
     # Training auf zufaelligen Entscheidungspunkt-Zustaenden (Fahrzeuge unterwegs,
     # mit Restdistanz) -- nicht mehr nur auf dem t=0-Zustand.
-    trained_policy = train(num_epochs=500, batch_size=64, num_customers=TRAIN_CUSTOMERS,
+    trained_policy = train(num_epochs=500, batch_size=32, num_customers=TRAIN_CUSTOMERS,
                             num_vehicles=NUM_VEHICLES, span_coefficient=SPAN_COEFFICIENT,
                             dynamic_start=True, seed=TRAIN_SEED)
 
